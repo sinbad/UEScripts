@@ -96,7 +96,64 @@ function Set-Svn-Props {
         [string]$path
         )
 
-    # TODO implement merge
+    if (-not $overwriteprops) {
+        # We need to merge our props with whatever is already present
+        # Can't believe SVN doesn't have a command for this (facepalm)
+        $oldvalues = $(svn propget $propname $path)
+        $oldarray = $oldvalues -split "\r?\n"
+        $newarray = $values -split "\r?\n"
+        # remove duplicates & Empties and sort both arrays so we can insert
+        $oldarray = $oldarray | Where-Object {$_} | Select-Object -Unique | Sort-Object
+        $newarray = $newarray | Where-Object {$_} | Select-Object -Unique | Sort-Object
+        # create modifiable list for merged
+        $finallist = [System.Collections.ArrayList]@()
+        $oldidx = 0
+        foreach ($newitem in $newarray) {
+            # If this is a X = Y row, then we only match the X part
+            $match = $newitem
+            $iskeyvalue = $($newitem -contains "=")
+            if ($iskeyvalue) {
+                $match = $newitem.split("=")[0].trim()
+            }
+
+            $insertednewitem = $false
+            while (-not $insertednewitem) {
+                if ($oldidx -lt $oldarray.Length) {
+                    $olditem = $oldarray[$oldidx]
+                    $oldmatch = $olditem
+                    if ($iskeyvalue) {
+                        $oldmatch = $olditem.split("=")[0].trim()
+                    }
+
+                    if ($match -eq $oldmatch) {
+                        # use new value
+                        $finallist.Add($newitem)
+                        ++$oldidx
+                    } elseif ($match -gt $oldmatch) {
+                        $finallist.Add($olditem)
+                        ++$oldidx
+                    } else {
+                        $finallist.Add($newitem)
+                        $insertednewitem = $true
+                    }
+                } else {
+                    # run out of old items, just append new
+                    $finallist.Add($newitem)
+                    $insertednewitem = $true
+                }
+            }
+        }
+        while ($oldidx -lt $oldarray.Length) {
+            ## Add any trailing old items
+            $finallist.Add($oldarray[$oldidx++])
+        }
+
+        # Convert to final values
+        $values = $($finallist -join "`n")
+        
+        Write-Verbose "Merged values for $propname on '$path': `n$values"
+    }
+
     if ($dryrun) {
         Write-Output "PROPS: Would have set $propname on '$path' to: `n$values"
     } else {
