@@ -11,7 +11,7 @@ param (
 function Print-Usage {
     Write-Output "Steve's UE4 Subversion Repo Setup Tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-svn-setup.ps1 [-src:sourcefolder] [-skipstructurecheck]"
+    Write-Output "  ue4-svn-setup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of trunk in new repo)"
@@ -19,7 +19,7 @@ function Print-Usage {
     Write-Output "               : Skip the check that makes sure you're in trunk"
     Write-Output "  -overwriteprops"
     Write-Output "               : Replace all properties instead of merging"
-    Write-Output "               : Will overwrite svn:ignore, svn:global-ignores"
+    Write-Output "               : Will overwrite svn:ignore, svn:global-ignores, svn:auto-props"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
 }
