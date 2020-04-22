@@ -129,6 +129,7 @@ function Set-Svn-Props {
                         # use new value
                         $finallist.Add($newitem)
                         ++$oldidx
+                        $insertednewitem = $true
                     } elseif ($match -gt $oldmatch) {
                         $finallist.Add($olditem)
                         ++$oldidx
