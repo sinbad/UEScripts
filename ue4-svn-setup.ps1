@@ -88,6 +88,7 @@ $root_autoprops = @"
 "@
 
 $content_folders = @"
+Content/
 Content/Animation
 Content/Audio
 Content/Audio/FX
@@ -100,6 +101,17 @@ Content/Materials
 Content/Meshes
 Content/Particles
 Content/Textures
+Content/Textures/UI
+"@
+
+$mediasrc_folders = @"
+MediaSrc
+MediaSrc/Audio
+MediaSrc/Audio/FX
+MediaSrc/Audio/Music
+MediaSrc/Meshes
+MediaSrc/Textures
+MediaSrc/Textures/UI
 "@
 
 function Set-Svn-Props {
@@ -245,8 +257,14 @@ if (-not $skipstructurecheck) {
 
 
 try {
-    # Make sure Content exists & is already under version control so we can setup ignore props
-    Create-Svn-Folder Content
+    # Create Content & subfolders of Content so that they already exist & properties work
+    foreach ($cf in $content_folders -split "\r?\n") {
+        Create-Svn-Folder $cf
+    }
+    foreach ($msf in $mediasrc_folders -split "\r?\n") {
+        Create-Svn-Folder $msf
+    }
+
 
     # Ignore root folders we don't need
     Set-Svn-Props "svn:ignore" $root_svnignore "."
@@ -260,11 +278,6 @@ try {
 
     # Now set up svn:needs-lock in auto-props
     Set-Svn-Props "svn:auto-props" $root_autoprops "."
-
-    # Create subfolders of Content so that they already exist & svn:global-ignores work
-    foreach ($cf in $content_folders -split "\r?\n") {
-        Create-Svn-Folder $cf
-    }
 
 } catch {
     Write-Output $_.Exception.Message
