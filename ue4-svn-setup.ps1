@@ -127,19 +127,19 @@ function Set-Svn-Props {
 
                     if ($match -eq $oldmatch) {
                         # use new value
-                        $finallist.Add($newitem)
+                        $finallist.Add($newitem) > $null # ArrayList.Add returns index & prints it
                         ++$oldidx
                         $insertednewitem = $true
                     } elseif ($match -gt $oldmatch) {
-                        $finallist.Add($olditem)
+                        $finallist.Add($olditem) > $null
                         ++$oldidx
                     } else {
-                        $finallist.Add($newitem)
+                        $finallist.Add($newitem) > $null
                         $insertednewitem = $true
                     }
                 } else {
                     # run out of old items, just append new
-                    $finallist.Add($newitem)
+                    $finallist.Add($newitem) > $null
                     $insertednewitem = $true
                 }
             }
