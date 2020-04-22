@@ -87,6 +87,20 @@ $root_autoprops = @"
 *.zip = svn:mime-type=application/zip;svn:needs-lock=*
 "@
 
+$content_folders = @"
+Content/Animation
+Content/Audio
+Content/Audio/FX
+Content/Audio/Music
+Content/Blueprints
+Content/Blueprints/UI
+Content/Fonts
+Content/Maps
+Content/Materials
+Content/Meshes
+Content/Particles
+Content/Textures
+"@
 
 function Set-Svn-Props {
 
@@ -164,6 +178,35 @@ function Set-Svn-Props {
 
 }
 
+function Create-Svn-Folder {
+    param (
+        [string]$fld
+        )
+
+        if (-not $(Test-Path $fld)) {
+        Write-Output "FIXED: $fld folder did not exist, creating"
+        if (-not $dryrun) {
+            New-Item -Path $fld -ItemType Directory > $null
+        }
+    }
+    
+    $statline = svn status -v --depth=empty $fld
+    if ($statline) {
+        $status = $statline[0]
+    } else {
+        $status = '?'
+    }
+    if ($status -eq 'I' -or $status -eq '?') {
+        Write-Output "FIXED: $fld directory is not tracked in SVN, adding"
+        if (-not $dryrun) {
+            # Add but don't add any contents yet because we may need to ignore them
+            svn add --depth=empty $fld > $null
+        }
+    }
+    
+    
+}
+
 if ($help) {
     Print-Usage
     Exit 0
@@ -200,31 +243,11 @@ if (-not $skipstructurecheck) {
     Write-Verbose "SVN URL is $svnurl, all OK"
 }
 
-# Make sure Content exists & is already under version control and if not, add
-if (-not $(Test-Path Content)) {
-    Write-Output "FIXED: Content folder did not exist, creating"
-    if (-not $dryrun) {
-        New-Item -Path Content -ItemType Directory
-    }
-
-}
-
-$statline = svn status -v --depth=empty Content
-if ($statline) {
-    $status = $statline[0]
-} else {
-    $status = '?'
-}
-if ($status -eq 'I' -or $status -eq '?') {
-    Write-Output "Content directory is not tracked in SVN, adding"
-    if (-not $dryrun) {
-        # Add but don't add any contents yet because we'll need to ignore them
-        # We're creating this because it needs to be added to SVN to add ignores!
-        svn add --depth=empty Content
-    }
-}
 
 try {
+    # Make sure Content exists & is already under version control so we can setup ignore props
+    Create-Svn-Folder Content
+
     # Ignore root folders we don't need
     Set-Svn-Props "svn:ignore" $root_svnignore "."
 
@@ -238,14 +261,15 @@ try {
     # Now set up svn:needs-lock in auto-props
     Set-Svn-Props "svn:auto-props" $root_autoprops "."
 
+    # Create subfolders of Content so that they already exist & svn:global-ignores work
+    foreach ($cf in $content_folders -split "\r?\n") {
+        Create-Svn-Folder $cf
+    }
+
 } catch {
     Write-Output $_.Exception.Message
     Exit 9
 }
-
-
-
-# TODO create/add common subfolders of Content so that they already exist & svn:global-ignores work
 
 
 
