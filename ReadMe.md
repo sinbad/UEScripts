@@ -42,8 +42,8 @@ Usage:
 1. **Sets binary files to needs-lock**
 
    By setting the `svn:auto-props` value for common binary types tracked in the
-   repo such as .uasset and .umap, it enforces locking on those files, 
-   triggering UE4 to give you check out prompts when you edit those files.
+   repo such as `.uasset` and `.umap`, it enforces locking on those files, 
+   triggering UE4 to give you check out prompts when you edit them.
 
    This property is set on the root folder and is inherited throughout the tree.
 
@@ -58,22 +58,22 @@ Usage:
 
    I maintain this is *extremely* dumb behaviour because you can easily add
    files that should be ignored by accident, unless you manually add the folder 
-   first. However a big TSVN thread froma few years back has defended this
+   first. However a big TSVN thread from a few years back has defended this
    bizarre approach as "by design". So to mitigate this, I pre-create the
    majority of our preferred folder structure ahead of time.
 
    Our preferred **workflow** is:
 
    1. All content creation tool files in `$REPO/MediaSrc` (subfolders by type)
-      * These are typically in formats UE4 doesn't read directly, so outside `Content`
-      * These files are tracked in SVN
+      * These are typically in formats that UE4 might not read directly, so outside `Content`
+      * These files are *tracked* in SVN
    1. When exporting, place output (`FBX`, `PNG`, `WAV` etc) in `$REPO/Content` (and subfolders)
       * These files are *ignored* in SVN because they are derived data
       * UE4 imports them to a `.uasset` which contains all their contents anyway
-   1. All `.uasset` post-imported content in `$REPO/Content` is tracked in SVN (binary)
+   1. All `.uasset` post-imported content in `$REPO/Content` is *tracked* in SVN (binary)
      
    So the tool pre-creates `MediaSrc`, `Content` and subfolders (if they don't already
-   exist), and add them to Subversion ahead of time to head off as many quirks
+   exist), and adds them to Subversion ahead of time to head off as many quirks
    as possible.
 
 1. **Ignore derived export data in Content folder**
