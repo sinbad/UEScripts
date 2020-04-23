@@ -10,6 +10,7 @@ param (
 
 function Print-Usage {
     Write-Output "Steve's UE4 Subversion Repo Setup Tool"
+    Write-Output "  Run this if you already have a SVN trunk checkout"
     Write-Output "Usage:"
     Write-Output "  ue4-svn-setup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
