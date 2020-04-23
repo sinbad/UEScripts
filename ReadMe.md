@@ -8,15 +8,15 @@ having to remember everything.
 We use a particular content workflow that SVN is set up to support:
 
 1. All content creation files in `$REPO/MediaSrc` (subfolders by type)
-    > * These are typically in formats e.g. Maya that UE4 doesn't read directly, so outside `Content`
-    > * These files are *tracked* in SVN
+    * These are typically in formats e.g. Maya that UE4 doesn't read directly, so outside `Content`
+    * These files are *tracked* in SVN
 1. When exporting, output (`FBX`, `PNG`, `WAV` etc) goes in `$REPO/Content` (and subfolders)
-    > * These files are *ignored* in SVN because they are derived data
-    > * UE4 imports them to a `.uasset` which contains all their contents anyway
+    * These files are *ignored* in SVN because they are derived data
+    * UE4 imports them to a `.uasset` which contains all their contents anyway
 1. All `.uasset` post-imported content in `$REPO/Content` is *tracked* in SVN (binary)
 1. Binary content is marked as needing *locking* so UE4 will prompt you to check it out
-    > * This is to avoid accidental parallel changes to the (many) binary files UE4 uses
-    > * This is our overriding reason for using Subversion and not Git
+    * This is to avoid accidental parallel changes to the (many) binary files UE4 uses
+    * This is our overriding reason for using Subversion and not Git
 
 Together the scripts below configure everything so I don't have to remember.
 
