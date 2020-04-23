@@ -126,7 +126,10 @@ function Set-Svn-Props {
     if (-not $overwriteprops) {
         # We need to merge our props with whatever is already present
         # Can't believe SVN doesn't have a command for this (facepalm)
-        $oldvalues = $(svn propget $propname $path)
+        # We need to continue on error if property doesn't exist
+        $ErrorActionPreference = "SilentlyContinue"
+        $oldvalues = (svn propget $propname $path 2>$null)
+        $ErrorActionPreference = "Stop"
         $oldarray = $oldvalues -split "\r?\n"
         $newarray = $values -split "\r?\n"
         # remove duplicates & Empties and sort both arrays so we can insert
