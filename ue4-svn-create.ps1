@@ -81,7 +81,7 @@ Write-Output "Creating trunk/branches/tags folders"
 
 $commit = $false
 foreach ($dir in @("trunk", "branches", "tags")) {
-    if (-not $(Test-Path trunk)) {
+    if (-not $(Test-Path $dir)) {
         New-Item $dir -ItemType Directory > $null
         svn add $dir > $null
         $commit = $true
