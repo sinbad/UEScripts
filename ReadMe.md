@@ -1,15 +1,50 @@
 # Steve's UE4 Scripts
 
+## Subversion Repo Creation Script
+
+This constructs the entirety of the starting repository from a Subversion URL
+(which should contain an empty repository, or at most empty trunk/branches/tags
+subfolders).
+
+Usage:
+```
+      ue4-svn-create.ps1 [-urn:]svnurl [[-path:]checkoutpath] [Options]
+     
+      -url         : Subversion URL; the ROOT path (should be empty)
+      -path        : Checkout path; if omitted append last part of URL to current dir
+      -help        : Print this help
+```
+
+It does everything that the [setup script below](#subversion-repo-setup-script) does, 
+but also creates the trunk/branches/tags structure, and checks out trunk for you.
+It also commits all the changes so your repo is ready to go.
+
+Unreal doesn't let you create a new project inside a directory with contents,
+so create your new project elsewhere then copy it into this new trunk checkout.
+Unfortunately there's no way to avoid this because we need folders to exist
+to set SVN properties on them.
+
+Steps to create a new UE4 SVN project:
+
+1. Create new repo on your Subversion server, note the URL e.g. https://foo/bar
+2. Run `ue4-svn-create.ps1 [URL]` in the parent folder you want your project to live
+   * This will create a folder called "bar" by default due to URL suffix
+3. In UE4, create a new project somewhere else, then save & close
+4. **Move** the contents of the UE4 project into your "bar" folder
+5. Commit
+6. Open UE4 again and browse to the "bar" folder to open your project
+
+
 ## Subversion Repo Setup Script
 
-This initialises the structure of a Subversion repository for UE4
-usage. Run in the root of a new Subversion repository, whether you've created 
-the UE4 project in there yet or not.
+This is a second-level script to intialise the structure of an existing Subversion 
+trunk checkout for UE4. Run in the root of that trunk checkout - it will work
+for existing UE4 folders or blank repositories (you'll have to copy a UE4 project
+in later).
 
 Usage:
 ```
     ue4-svn-setup.ps1 [[-src:]sourcefolder] [Options]
-
         -src         : Source folder (current folder if omitted)
                      : (should be root of trunk in new repo)
         -skipstructurecheck
