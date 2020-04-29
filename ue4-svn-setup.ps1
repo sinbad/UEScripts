@@ -91,9 +91,6 @@ $root_autoprops = @"
 $content_folders = @"
 Content/
 Content/Animation
-Content/Audio
-Content/Audio/FX
-Content/Audio/Music
 Content/Blueprints
 Content/Blueprints/UI
 Content/Fonts
