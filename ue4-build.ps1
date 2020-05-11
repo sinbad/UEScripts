@@ -120,6 +120,23 @@ try {
             Write-Verbose "UE4 project is not open in editor"
         }
         Remove-Variable ue4proc
+
+        # Because we know editor is closed, Hot Reload DLLs are OK to clean up
+        # Build will only occur to the main DLL
+        # Pattern is .\Binaries\Win64\UE4Editor-<name>-9999.dll|pdb
+        Write-Output "Cleaning up old Hot Reload DLLs/PDBs"
+        $cleanupdir = ".\Binaries\Win64"
+        $cleanupfiles = @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.dll" | Select-Object -Expand Name)
+        $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.pdb" | Select-Object -Expand Name)
+        foreach ($cf in $cleanupfiles) {
+            if ($dryrun) {
+                Write-Output "Would have deleted $cleanupdir\$cf"
+            } else {
+                Write-Verbose "Deleting $cleanupdir\$cf"
+                Remove-Item "$cleanupdir\$cf" -Force
+            }
+        }
+
     }
 
     $buildargs = ""
