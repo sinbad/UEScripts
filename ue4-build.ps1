@@ -69,12 +69,13 @@ try {
         throw "Multiple Unreal project files found in $(Get-Location)! Aborting."
     }
 
-    Write-Output "Building $uprojfile for $mode"
+    # In PS 6.0+ we could use Split-Path -LeafBase but let's stick with built-in PS 5.1
+    $uprojname = [System.IO.Path]::GetFileNameWithoutExtension($uprojfile)
+    Write-Output "Building $uprojname for $mode"
 
     # Check version number of UE4 project so we know which version to run
     # We can read this from .uproject which is JSON
     $uproject = Get-Content $uprojfile | ConvertFrom-Json
-
     $uversion = $uproject.EngineAssociation
 
     # UE4INSTALL env var should point at the root of the *specific version* of 
@@ -92,29 +93,70 @@ try {
         $uinstall = Join-Path $uroot "UE_$uversion"
     }
 
-    # Test we can find RunUAT.bat
-    $uat = Join-Path "$uinstall" "Engine\Build\BatchFiles\RunUAT.bat"
-    if (-not (Test-Path $uat -PathType Leaf)) {
-        throw "Unreal Automation Tool doesn't exist at $uat : Aborting"
+    # Test we can find Build.bat
+    $batchfolder = Join-Path "$uinstall" "Engine\Build\BatchFiles"
+    $buildbat = Join-Path "$batchfolder" "Build.bat"
+    if (-not (Test-Path $buildbat -PathType Leaf)) {
+        throw "Build.bat missing at $buildbat : Aborting"
     }
 
-    Write-Verbose "Running $uat"
-
-
     # Close UE4 as early as possible
-    # if (-not $dryrun -and -not $nocloseeditor) {
-    #     # Check if Unity is running, if so try to shut it gracefully
-    #     $ue4proc = Get-Process UE4Editor | Where-Object {$_.MainWindowTitle -like "ue4localise*" }
-    #     if ($ue4proc) {
-    #         Write-Output "UE4 is currently running, trying to gracefully shut window "
-    #         $ue4proc.CloseMainWindow()
-    #         Start-Sleep 5
-    #         if (!$ue4proc.HasExited) {
-    #             throw "Couldn't close UE4 gracefully, aborting!"
-    #         }
-    #     }
-    #     Remove-Variable ue4proc
-    # }
+    if (-not $nocloseeditor) {
+        # Check if UE4 is running, if so try to shut it gracefully
+        # Filter by project name in main window title, it's always called "Project - Unreal Editor"
+        $ue4proc = Get-Process UE4Editor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojname*" }
+        if ($ue4proc) {
+            if ($dryrun) {
+                Write-Output "UE4 project is currently open in editor, would have closed"
+            } else {
+                Write-Output "UE4 project is currently open in editor, closing..."
+                $ue4proc.CloseMainWindow() > $null 
+                Start-Sleep 5
+                if (!$ue4proc.HasExited) {
+                    throw "Couldn't close UE4 gracefully, aborting!"
+                }
+            }
+        } else {
+            Write-Verbose "UE4 project is not open in editor"
+        }
+        Remove-Variable ue4proc
+    }
+
+    $buildargs = ""
+
+    switch ($mode) {
+        'dev' {
+            # Stolen from the VS project settings because boy is this badly documented
+            # Target needs "Editor" on the end to make this "Development Editor"
+            # The -Project seems to be needed, as is the -FromMsBuild
+            # -Project has to point at the ABSOLUTE PATH of the uproject
+            $uprojfileabs = Join-Path "$(Get-Location)" $uprojfile
+            $buildargs = "${uprojname}Editor Win64 Development -Project=`"${uprojfileabs}`" -WaitMutex -FromMsBuild"
+        }
+        default {
+            # TODO
+            # We probably want to use custom launch profiles for this
+            Write-Output "Mode '$mode' is not supported yet"
+        }
+    }
+
+    if ($dryrun) {
+        Write-Output "Would run: build.bat $buildargs"
+    } else {
+        Write-Verbose "Running $buildbat $buildargs"
+        $process = (Start-Process $buildbat -ArgumentList $buildargs -PassThru)
+        # Spinwait since -Wait doesn't seem to work?
+        do {
+            Write-Host "." -NoNewline
+            start-sleep -Milliseconds 1000
+        } until ($process.HasExited)
+
+        if ($process.ExitCode -ne 0) {
+            $code = $process.ExitCode
+            throw "*** Build exited with code $code, see above"
+        }
+
+    }
 
 
     # Try to locate RunUAT.bat so we don't have to add UE4 version to PATH
