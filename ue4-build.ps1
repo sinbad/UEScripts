@@ -23,6 +23,14 @@ function Print-Usage {
     Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent DLL cleanup)"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
+    Write-Output " "
+    Write-Output "Environment Variables:"
+    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
+    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
+    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
+    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output " "
+
 }
 
 $ErrorActionPreference = "Stop"
@@ -39,7 +47,7 @@ if (-not $mode) {
     Exit 3
 }
 
-if (-not (@('dev', 'test', 'prod') -contains $mode)) {
+if (-not ($mode -in @('dev', 'test', 'prod'))) {
     Print-Usage
     Write-Output "ERROR: Invalid mode argument: $mode"
     Exit 3
