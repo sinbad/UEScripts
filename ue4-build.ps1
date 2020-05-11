@@ -144,18 +144,33 @@ try {
         Write-Output "Would run: build.bat $buildargs"
     } else {
         Write-Verbose "Running $buildbat $buildargs"
-        $process = (Start-Process $buildbat -ArgumentList $buildargs -PassThru)
-        # Spinwait since -Wait doesn't seem to work?
+
+        $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+        $pinfo.FileName = $buildbat
+        $pinfo.RedirectStandardError = $true
+        $pinfo.RedirectStandardOutput = $true
+        $pinfo.UseShellExecute = $false
+        $pinfo.Arguments = $buildargs
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $pinfo
+        $process.Start() | Out-Null
+
+        Write-Host "UE4 Build: " -NoNewline
         do {
             Write-Host "." -NoNewline
             start-sleep -Milliseconds 1000
         } until ($process.HasExited)
+        Write-Host "."
 
         if ($process.ExitCode -ne 0) {
             $code = $process.ExitCode
+            Write-Output $process.StandardOutput.ReadToEnd()
+            Write-Output $process.StandardError.ReadToEnd()
             throw "*** Build exited with code $code, see above"
+        } else {
+            Write-Verbose $process.StandardOutput.ReadToEnd()           
+            Write-Output "---- UE4 Build OK ----"
         }
-
     }
 
 
