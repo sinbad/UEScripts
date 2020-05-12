@@ -190,12 +190,6 @@ try {
         }
     }
 
-
-    # Try to locate RunUAT.bat so we don't have to add UE4 version to PATH
-    # Most likely in
-    # C:\Program Files\Epic Games\UE_4.24\Engine\Build\BatchFiles
-
-
 } catch {
         Write-Output "ERROR: $($_.Exception.Message)"
         $result = 9
