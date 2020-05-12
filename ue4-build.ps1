@@ -80,6 +80,8 @@ try {
     $uproject = Get-Content $uprojfile | ConvertFrom-Json
     $uversion = $uproject.EngineAssociation
 
+    Write-Output "Engine version is $uversion"
+
     # UE4INSTALL env var should point at the root of the *specific version* of 
     # UE4 you want to use. This is mainly for use in source builds, default is
     # to build it from version number and root of all UE4 binary installs
