@@ -71,7 +71,11 @@ try {
 
     # In PS 6.0+ we could use Split-Path -LeafBase but let's stick with built-in PS 5.1
     $uprojname = [System.IO.Path]::GetFileNameWithoutExtension($uprojfile)
-    Write-Output "Building $uprojname for $mode"
+    if ($dryrun) {
+        Write-Output "Would build $uprojname for $mode"
+    } else {
+        Write-Output "Building $uprojname for $mode"
+    }
 
     # Check version number of UE4 project so we know which version to run
     # We can read this from .uproject which is JSON
@@ -124,7 +128,11 @@ try {
         # Because we know editor is closed, Hot Reload DLLs are OK to clean up
         # Build will only occur to the main DLL
         # Pattern is .\Binaries\Win64\UE4Editor-<name>-9999.dll|pdb
-        Write-Output "Cleaning up old Hot Reload DLLs/PDBs"
+        if ($dryrun) {
+            Write-Output "Would clean up old Hot Reload DLLs/PDBs"
+        } else {
+            Write-Output "Cleaning up old Hot Reload DLLs/PDBs"
+        }
         $cleanupdir = ".\Binaries\Win64"
         $cleanupfiles = @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.dll" | Select-Object -Expand Name)
         $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.pdb" | Select-Object -Expand Name)
@@ -189,6 +197,8 @@ try {
             Write-Output "---- UE4 Build OK ----"
         }
     }
+
+    Write-Output "-- Build process finished OK --"
 
 } catch {
         Write-Output "ERROR: $($_.Exception.Message)"
