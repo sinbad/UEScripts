@@ -34,6 +34,10 @@ Intermediate
 Saved
 "@
 
+$root_globalignores = @"
+*.blend1
+"@
+
 $content_globalignores = @"
 *.bmp
 *.png
@@ -269,6 +273,9 @@ try {
 
     # Ignore root folders we don't need
     Set-Svn-Props "svn:ignore" $root_svnignore "."
+
+    # Add global ignores to root
+    Set-Svn-Props "svn:global-ignores" $root_globalignores "."
 
     # Globally ignore non .uasset files inside Content
     # Because we'll put all source files in MediaSource and export into Content for UE import
