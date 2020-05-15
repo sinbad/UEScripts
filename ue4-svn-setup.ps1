@@ -52,44 +52,8 @@ $content_globalignores = @"
 "@
 
 $root_autoprops = @"
-*.bmp = svn:mime-type=image/bmp;svn:needs-lock=*
-*.gif = svn:mime-type=image/gif;svn:needs-lock=*
-*.ico = svn:mime-type=image/x-icon;svn:needs-lock=*
-*.jpeg = svn:mime-type=image/jpeg;svn:needs-lock=*
-*.jpg = svn:mime-type=image/jpeg;svn:needs-lock=*
-*.png = svn:mime-type=image/png;svn:needs-lock=*
-*.tif = svn:mime-type=image/tiff;svn:needs-lock=*
-*.tiff = svn:mime-type=image/tiff;svn:needs-lock=*    
-*.tga = svn:needs-lock=*
-*.dds = svn:needs-lock=*
-*.exr = svn:needs-lock=*
 *.uasset = svn:needs-lock=*
 *.umap = svn:needs-lock=*
-*.mlt = svn:needs-lock=*
-*.blend = svn:needs-lock=*
-*.fbx = svn:needs-lock=*
-*.afphoto = svn:needs-lock=*
-*.afdesign = svn:needs-lock=*
-*.aup = svn:needs-lock=*
-*.mp3 = svn:needs-lock=*
-*.wav = svn:needs-lock=*
-*.doc = svn:mime-type=application/x-msword;svn:needs-lock=*
-*.docx = svn:mime-type=application/x-msword;svn:needs-lock=*
-*.jar = svn:mime-type=application/octet-stream;svn:needs-lock=*
-*.odc = svn:mime-type=application/vnd.oasis.opendocument.chart;svn:needs-lock=*
-*.odf = svn:mime-type=application/vnd.oasis.opendocument.formula;svn:needs-lock=*
-*.odg = svn:mime-type=application/vnd.oasis.opendocument.graphics;svn:needs-lock=*
-*.odi = svn:mime-type=application/vnd.oasis.opendocument.image;svn:needs-lock=*
-*.odp = svn:mime-type=application/vnd.oasis.opendocument.presentation;svn:needs-lock=*
-*.ods = svn:mime-type=application/vnd.oasis.opendocument.spreadsheet;svn:needs-lock=*
-*.odt = svn:mime-type=application/vnd.oasis.opendocument.text;svn:needs-lock=*
-*.pdf = svn:mime-type=application/pdf;svn:needs-lock=*
-*.ppt = svn:mime-type=application/vnd.ms-powerpoint;svn:needs-lock=*
-*.ser = svn:mime-type=application/octet-stream;svn:needs-lock=*
-*.swf = svn:mime-type=application/x-shockwave-flash;svn:needs-lock=*
-*.vsd = svn:mime-type=application/x-visio;svn:needs-lock=*
-*.xls = svn:mime-type=application/vnd.ms-excel;svn:needs-lock=*
-*.zip = svn:mime-type=application/zip;svn:needs-lock=*
 "@
 
 $content_folders = @"
