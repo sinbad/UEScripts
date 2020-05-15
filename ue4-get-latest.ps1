@@ -72,6 +72,10 @@ try {
     # Use Invoke-Expression so we can use a string as options
     Invoke-Expression "&'$PSScriptRoot/ue4-build.ps1' dev $args"
 
+    if ($LASTEXITCODE -ne 0) {
+        throw "Build process failed, see above"
+    }
+
     Write-Output "-- Get Latest finished OK --"
 
 
