@@ -143,6 +143,13 @@ if ($help) {
     Exit 0
 }
 
+if (-not (Get-Module -ListAvailable -Name PsIni)) {
+    Write-Output "Missing module: PsIni"
+    Write-Output "This script uses PsIni to update the UE4 DefaultEngine.ini"
+    Write-Output "Install it using 'Install-Module PsIni [-Scope CurrentUser]'"
+    Exit 2
+}
+
 if ($src.Length -eq 0) {
     $src = "."
     Write-Verbose "-src not specified, assuming current directory"
@@ -183,6 +190,15 @@ try {
     foreach($f in $gitlfs_locked -split "\r?\n") {
         git lfs track --lockable "$f"
     }
+
+    # Configure DefaultEngine.ini to make Git LFS operations MUCH faster
+    #    [SystemSettingsEditor]
+    #    r.Editor.SkipSourceControlCheckForEditablePackages = 1
+    # Seriously, without this saving a locked LFS file takes ~5s vs 0.5s
+    Import-Module PsIni
+    $engineIni = Get-IniContent "Config/DefaultEngine.ini"
+    $engineIni["SystemSettingsEditor"] = @{"r.Editor.SkipSourceControlCheckForEditablePackages" = "1"}
+    Out-IniFile -Force -InputObject $engineIni -FilePath "Config/DefaultEngine.ini"
 
     # TODO git submodule UE4Plugin
 
