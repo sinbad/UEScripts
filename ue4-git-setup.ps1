@@ -21,6 +21,9 @@ function Print-Usage {
     Write-Output "  -help        : Print this help"
 }
 
+$gitPluginURL = "git@github.com:sinbad/UE4GitPlugin.git"
+$gitPluginBranch = "ue4_24-fixes"
+
 $gitlfs_notlocked = @"
 *.fbx
 *.zip
@@ -200,7 +203,14 @@ try {
     $engineIni["SystemSettingsEditor"] = @{"r.Editor.SkipSourceControlCheckForEditablePackages" = "1"}
     Out-IniFile -Force -InputObject $engineIni -FilePath "Config/DefaultEngine.ini"
 
-    # TODO git submodule UE4Plugin
+    # git submodule UE4Plugin
+    if (!(Test-Path "Plugins/UE4GitPlugin/GitSourceControl.uplugin")) {
+        Write-Output "Checking out $gitPluginURL/$gitPluginBranch..."
+        if (!(Test-Path Plugins)) {
+            New-Item -ItemType Directory Plugins > $null
+        }
+        git submodule add -b $gitPluginBranch $gitPluginURL Plugins/UE4GitPlugin
+    }
 
 
 } catch {
