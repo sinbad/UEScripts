@@ -48,17 +48,58 @@ try {
         throw "Multiple Unreal project files found in $(Get-Location)! Aborting."
     }
 
-    # Hard coded for Subversion right now
-    if ($dryrun) {
-        Write-Output "Checking for updates we WOULD do:"
-        svn status --show-updates
-    } else {
-        Write-Output "Updating to latest..."
-        svn up
-    }
+    $isGit = Test-Path .git
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Subversion update failed, see above"
+    if ($isGit) {
+        git diff --no-patch --exit-code > $null
+        $unstagedChanges = ($LASTEXITCODE -ne 0)
+        git diff --no-patch --cached --exit-code > $null
+        $stagedChanges = ($LASTEXITCODE -ne 0)
+
+        if ($unstagedChanges -or $stagedChanges) {
+            if ($dryrun) {
+                Write-Output "Changes present, would have run 'git stash push'"
+            } else {
+                Write-Output "Working copy has changes, saving them in stash"
+                git stash push -q -m "Saved changes during Get Latest"
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Output "ERROR: git stash push failed, aborting"
+                    exit 5
+                }
+            }
+        }
+
+        # Use rebase pull to keep simpler
+        Write-Output "Pulling latest from Git..."
+        git pull --rebase
+        if ($LASTEXITCODE -ne 0) {
+            Write-Output "ERROR: git pull failed!"
+            exit 5
+        }
+
+        if ($unstagedChanges -or $stagedChanges) {
+            Write-Output "Re-applying your saved changes..."
+            git stash pop > $null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Output "ERROR: Failed to re-apply your changes, resolve manually from stash!"
+                exit 5
+            }
+        }
+    } else {
+        # Assume svn
+
+        # Hard coded for Subversion right now
+        if ($dryrun) {
+            Write-Output "Checking for updates we WOULD do:"
+            svn status --show-updates
+        } else {
+            Write-Output "Updating to latest..."
+            svn up
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "Subversion update failed, see above"
+        }
     }
 
     # Now build
