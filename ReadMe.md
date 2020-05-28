@@ -2,16 +2,22 @@
 
 ## Summary
 
-These scripts are to help me set up a Subversion repository for UE4 without
+These scripts are to help me set up Git / Subversion repositories for UE4 without
 having to remember everything.
 
-We use a particular content workflow that SVN is set up to support:
+Initially we'd decided to go back to Subversion because of the importance of
+good locking workflow for uasset/umap files in UE4, to prevent binary merge errors.
+However thanks to the good LFS and locking support in the [Git LFS 2 (beta)
+plugin](https://github.com/SRombauts/UE4GitPlugin), and a couple of config tweaks, 
+we managed to move back to Git + LFS.
+
+We use a particular content workflow:
 
 1. All content creation files in `$REPO/MediaSrc` (subfolders by type)
-    * These are typically in formats e.g. Maya that UE4 doesn't read directly, so outside `Content`
-    * These files are *tracked* in SVN
+    * These are typically in formats e.g. Blender that UE4 doesn't read directly, so outside `Content`
+    * These files are *tracked* in source control
 1. When exporting, output (`FBX`, `PNG`, `WAV` etc) goes in `$REPO/Content` (and subfolders)
-    * These files are *ignored* in SVN because they are derived data
+    * These files are *ignored* in source control because they are derived data
     * UE4 imports them to a `.uasset` which contains all their contents anyway
 1. All `.uasset` post-imported content in `$REPO/Content` is *tracked* in SVN (binary)
 1. Binary content is marked as needing *locking* so UE4 will prompt you to check it out
@@ -19,6 +25,21 @@ We use a particular content workflow that SVN is set up to support:
     * This is our overriding reason for using Subversion and not Git
 
 Together the scripts below configure everything so I don't have to remember.
+
+## Steps to set up Git + LFS for a UE4 project
+
+1. The script works for projects with no git repo yet, or those with an existing git repo
+1. For existing repos, ideally you will not have committed any large files to Git yet
+   * If you have, it is *highly recommended* you use `git lfs migrate` to re-write your repository history to be LFS compatible
+   * `git lfs migrate import --everything --include="*.uasset,*.umap,<others>"`
+   * This repo will need to be re-cloned by everyone but it's MUCH cleaner than changing to LFS mid-history
+1. Make a note of any custom .gitignore entries you have, the script will replace it
+1. Run `ue4-git-setup.ps1` in the root project folder
+1. Add back any specialised .gitignores we didn't cover (might not need any)
+1. Push ALL BRANCHES of this new repo to the host of your choice
+
+
+# OLD Subversion Information
 
 ## Steps to create a new SVN repo for a UE4 project
 
