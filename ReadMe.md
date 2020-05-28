@@ -39,7 +39,7 @@ Together the scripts below configure everything so I don't have to remember.
 1. Push ALL BRANCHES of this new repo to the host of your choice
 
 
-# OLD Subversion Information
+# Subversion Information (ignore below if using Git)
 
 ## Steps to create a new SVN repo for a UE4 project
 
