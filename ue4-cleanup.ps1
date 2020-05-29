@@ -8,7 +8,7 @@ param (
 
 function Print-Usage {
     Write-Output "Steve's UE4 Project Cleanup Tool"
-    Write-Output "   Get latest from repo and build for dev. Will close UE4 editor!"
+    Write-Output "   Clean up hot-reload DLLs & prune LFS to free space. Will close UE4 editor!"
     Write-Output "Usage:"
     Write-Output "  ue4-cleanup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
