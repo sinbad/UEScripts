@@ -110,13 +110,17 @@ try {
 
     }
 
-    if (-not $nolfsprune) {
-        if ($dryrun) {
-            Write-Output "Would have pruned LFS files"
-            git lfs prune --dry-run
-        } else {
-            Write-Output "Pruning Git LFS files"
-            git lfs prune
+    
+    $isGit = Test-Path .git
+    if ($isGit) {
+        if (-not $nolfsprune) {
+            if ($dryrun) {
+                Write-Output "Would have pruned LFS files"
+                git lfs prune --dry-run
+            } else {
+                Write-Output "Pruning Git LFS files"
+                git lfs prune
+            }
         }
     }
     Write-Output "-- Cleanup finished OK --"
