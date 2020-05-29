@@ -104,48 +104,16 @@ try {
         throw "Build.bat missing at $buildbat : Aborting"
     }
 
-    # Close UE4 as early as possible
-    if (-not $nocloseeditor) {
-        # Check if UE4 is running, if so try to shut it gracefully
-        # Filter by project name in main window title, it's always called "Project - Unreal Editor"
-        $ue4proc = Get-Process UE4Editor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojname*" }
-        if ($ue4proc) {
-            if ($dryrun) {
-                Write-Output "UE4 project is currently open in editor, would have closed"
-            } else {
-                Write-Output "UE4 project is currently open in editor, closing..."
-                $ue4proc.CloseMainWindow() > $null 
-                Start-Sleep 5
-                if (!$ue4proc.HasExited) {
-                    throw "Couldn't close UE4 gracefully, aborting!"
-                }
-            }
-        } else {
-            Write-Verbose "UE4 project is not open in editor"
-        }
-        Remove-Variable ue4proc
-
-        # Because we know editor is closed, Hot Reload DLLs are OK to clean up
-        # Build will only occur to the main DLL
-        # Pattern is .\Binaries\Win64\UE4Editor-<name>-9999.dll|pdb
-        if ($dryrun) {
-            Write-Output "Would clean up old Hot Reload DLLs/PDBs"
-        } else {
-            Write-Output "Cleaning up old Hot Reload DLLs/PDBs"
-        }
-        $cleanupdir = ".\Binaries\Win64"
-        $cleanupfiles = @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.dll" | Select-Object -Expand Name)
-        $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$uprojname-????.pdb" | Select-Object -Expand Name)
-        foreach ($cf in $cleanupfiles) {
-            if ($dryrun) {
-                Write-Output "Would have deleted $cleanupdir\$cf"
-            } else {
-                Write-Verbose "Deleting $cleanupdir\$cf"
-                Remove-Item "$cleanupdir\$cf" -Force
-            }
-        }
-
+    # Run cleanup tool
+    $cleanupargs = @()
+    if ($nocloseeditor) {
+        $cleanupargs += "-nocloseeditor"
     }
+    if ($dryrun) {
+        $cleanupargs += "-dryrun"
+    }
+    # Use Invoke-Expression so we can use a string as options
+    Invoke-Expression "&'$PSScriptRoot/ue4-cleanup.ps1' $cleanupargs"
 
     $buildargs = ""
 
