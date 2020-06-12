@@ -91,10 +91,15 @@ try {
         }
         Remove-Variable ue4proc
 
-        # Because we know editor is closed, Hot Reload DLLs are OK to clean up
-        Cleanup-DLLs ".\Binaries\Win64" $uprojname $dryrun
+        # Find all the modules in the project
+        $ujson = Get-Content $uprojfile | ConvertFrom-Json
+        foreach ($module in $ujson.Modules) {
+            # Because we know editor is closed, Hot Reload DLLs are OK to clean up
+            Cleanup-DLLs ".\Binaries\Win64" $module.Name $dryrun
+        }
 
-        # Also clean up plugins, since they will be rebuilt
+        # Also clean up SOURCE plugins, since they will be rebuilt
+        # This is not the same list as $ujson.Plugins, those are the binary ones
         $plugins = Get-ChildItem -Path .\Plugins -Filter *.uplugin -Recurse -ErrorAction SilentlyContinue -Force
         foreach ($pluginfile in $plugins) {
             $pluginname = [System.IO.Path]::GetFileNameWithoutExtension($pluginfile.FullName)
