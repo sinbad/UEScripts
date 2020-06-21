@@ -51,9 +51,9 @@ try {
     $isGit = Test-Path .git
 
     if ($isGit) {
-        git diff --no-patch --exit-code > $null
+        git diff --ignore-submodules --no-patch --exit-code > $null
         $unstagedChanges = ($LASTEXITCODE -ne 0)
-        git diff --no-patch --cached --exit-code > $null
+        git diff --ignore-submodules --no-patch --cached --exit-code > $null
         $stagedChanges = ($LASTEXITCODE -ne 0)
 
         if ($unstagedChanges -or $stagedChanges) {
