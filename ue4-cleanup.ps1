@@ -23,12 +23,16 @@ function Print-Usage {
 
 function Cleanup-DLLs($cleanupdir, $projname, $dryrun) {
     if ($dryrun) {
-        Write-Output "Would clean up old Hot Reload DLLs/PDBs in $cleanupdir for $projname"
+        Write-Output "Would clean up temporary DLLs/PDBs in $cleanupdir for $projname"
     } else {
-        Write-Output "Cleaning up old Hot Reload DLLs/PDBs in $cleanupdir for $projname"
+        Write-Output "Cleaning up temporary DLLs/PDBs in $cleanupdir for $projname"
     }
+    # Hot Reload files
     $cleanupfiles = @(Get-ChildItem "$cleanupdir\UE4Editor-$projname-????.dll" | Select-Object -Expand Name)
     $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname-????.pdb" | Select-Object -Expand Name)
+    # Live Coding files
+    $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname.exe.patch_*" | Select-Object -Expand Name)
+    $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname.pdb.patch_*" | Select-Object -Expand Name)
     foreach ($cf in $cleanupfiles) {
         if ($dryrun) {
             Write-Output "Would have deleted $cleanupdir\$cf"
