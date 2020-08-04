@@ -69,6 +69,17 @@ try {
             }
         }
 
+        # Run cleanup tool
+        $cleanupargs = @()
+        if ($nocloseeditor) {
+            $cleanupargs += "-nocloseeditor"
+        }
+        if ($dryrun) {
+            $cleanupargs += "-dryrun"
+        }
+        # Use Invoke-Expression so we can use a string as options
+        Invoke-Expression "&'$PSScriptRoot/ue4-cleanup.ps1' $cleanupargs"
+
         # Use rebase pull to keep simpler
         Write-Output "Pulling latest from Git..."
         git pull --rebase --recurse-submodules

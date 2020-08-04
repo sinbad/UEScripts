@@ -104,17 +104,6 @@ try {
         throw "Build.bat missing at $buildbat : Aborting"
     }
 
-    # Run cleanup tool
-    $cleanupargs = @()
-    if ($nocloseeditor) {
-        $cleanupargs += "-nocloseeditor"
-    }
-    if ($dryrun) {
-        $cleanupargs += "-dryrun"
-    }
-    # Use Invoke-Expression so we can use a string as options
-    Invoke-Expression "&'$PSScriptRoot/ue4-cleanup.ps1' $cleanupargs"
-
     $buildargs = ""
 
     switch ($mode) {
