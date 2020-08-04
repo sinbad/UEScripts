@@ -71,7 +71,7 @@ try {
 
         # Use rebase pull to keep simpler
         Write-Output "Pulling latest from Git..."
-        git pull --rebase
+        git pull --rebase --recurse-submodules
         if ($LASTEXITCODE -ne 0) {
             Write-Output "ERROR: git pull failed!"
             exit 5
