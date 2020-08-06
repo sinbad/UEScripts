@@ -61,7 +61,8 @@ try {
                 Write-Output "Changes present, would have run 'git stash push'"
             } else {
                 Write-Output "Working copy has changes, saving them in stash"
-                git stash push -q -m "Saved changes during Get Latest"
+                # Use our "LFS safe"
+                &"$PSScriptRoot/GitScripts/git-lfs-safe-stash.ps1" push -q -m "Saved changes during Get Latest"
                 if ($LASTEXITCODE -ne 0) {
                     Write-Output "ERROR: git stash push failed, aborting"
                     exit 5

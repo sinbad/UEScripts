@@ -1,0 +1,3 @@
+[submodule "GitScripts"]
+	path = GitScripts
+	url = git@github.com:sinbad/GitScripts.git
