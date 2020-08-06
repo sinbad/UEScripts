@@ -15,7 +15,7 @@ function Print-Usage {
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
     Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent DLL cleanup)"
-    Write-Output "  -nolfsprune  : Don't call 'git lfs prune' to delete old LFS files"
+    Write-Output "  -lfsprune    : Call 'git lfs prune' to delete old LFS files as well"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
     Write-Output " "
@@ -122,7 +122,7 @@ try {
     
     $isGit = Test-Path .git
     if ($isGit) {
-        if (-not $nolfsprune) {
+        if ($lfsprune) {
             if ($dryrun) {
                 Write-Output "Would have pruned LFS files"
                 git lfs prune --dry-run
