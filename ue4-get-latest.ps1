@@ -80,9 +80,9 @@ try {
         # Use Invoke-Expression so we can use a string as options
         Invoke-Expression "&'$PSScriptRoot/ue4-cleanup.ps1' $cleanupargs"
 
-        # Use rebase pull to keep simpler
+        # Stopped using rebase because it's a PITA when it goes wrong
         Write-Output "Pulling latest from Git..."
-        git pull --rebase --recurse-submodules
+        git pull --recurse-submodules
         if ($LASTEXITCODE -ne 0) {
             Write-Output "ERROR: git pull failed!"
             exit 5
