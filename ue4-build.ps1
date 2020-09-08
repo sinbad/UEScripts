@@ -15,7 +15,7 @@ function Print-Usage {
     Write-Output " "
     Write-Output "  -mode        : Build mode"
     Write-Output "               : dev = build Development Editor, dlls only (default)"
-    Write-Output "               : dev = build Development Editor locally for editor"
+    Write-Output "               : cleandev = build Development Editor CLEANLY"
     Write-Output "               : test = build Development and pacakge for test (TODO)"
     Write-Output "               : prod = build Shipping and package for production (TODO)"
     Write-Output "  -src         : Source folder (current folder if omitted)"
@@ -45,7 +45,7 @@ if (-not $mode) {
     $mode = "dev"
 }
 
-if (-not ($mode -in @('dev', 'test', 'prod'))) {
+if (-not ($mode -in @('dev', 'cleandev', 'test', 'prod'))) {
     Print-Usage
     Write-Output "ERROR: Invalid mode argument: $mode"
     Exit 3
@@ -114,6 +114,10 @@ try {
             # -Project has to point at the ABSOLUTE PATH of the uproject
             $uprojfileabs = Join-Path "$(Get-Location)" $uprojfile
             $buildargs = "${uprojname}Editor Win64 Development -Project=`"${uprojfileabs}`" -WaitMutex -FromMsBuild"
+        }
+        'cleandev' {
+            $uprojfileabs = Join-Path "$(Get-Location)" $uprojfile
+            $buildargs = "${uprojname}Editor Win64 Development -Project=`"${uprojfileabs}`" -WaitMutex -FromMsBuild -clean"
         }
         default {
             # TODO
