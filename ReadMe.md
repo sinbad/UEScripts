@@ -2,8 +2,15 @@
 
 ## Summary
 
-These scripts are to help me set up Git / Subversion repositories for UE4 without
-having to remember everything.
+These scripts are to help me with various repetetive or easy-to-forget tasks
+related to [Unreal Engine 4](https://www.unrealengine.com). 
+
+* [Setting up a project for Git / Git-LFS](#git-setup)
+* [Packaging Builds](#packaging-builds)
+* [Releasing builds to Itch, Steam](#releasing-builds)
+
+
+## Git Setup
 
 Initially we'd decided to go back to Subversion because of the importance of
 good locking workflow for uasset/umap files in UE4, to prevent binary merge errors.
@@ -26,7 +33,7 @@ We use a particular content workflow:
 
 Together the scripts below configure everything so I don't have to remember.
 
-## Steps to set up Git + LFS for a UE4 project
+### Steps to set up Git + LFS for a UE4 project
 
 1. The script works for projects with no git repo yet, or those with an existing git repo
 1. For existing repos, ideally you will not have committed any large files to Git yet
@@ -39,7 +46,16 @@ Together the scripts below configure everything so I don't have to remember.
 1. Push ALL BRANCHES of this new repo to the host of your choice
 
 
-# Subversion Information (ignore below if using Git)
+## Packaging builds
+
+.. TODO
+
+## Releasing Builds
+
+.. TODO
+
+
+# LEGACY: Subversion Information (ignore below if using Git)
 
 ## Steps to create a new SVN repo for a UE4 project
 

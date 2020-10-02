@@ -1,0 +1,51 @@
+{
+    "OutputDir": "/Path/To/Output/Parent/Dir",
+    "ZipDir": "/Path/To/Zipped/Releases/Folder",
+
+    "Target": "GameName",
+    "CookAllMaps": true,    
+    "MapsIncluded": [
+    ],
+    "MapsExcluded": [
+    ],
+    "UsePak": true,
+    "CompressPak": false,
+
+
+    "Variants": [
+        {
+            "Name": "PublicWin64SteamBuild", 
+            "Platform": "Win64",
+            "Configuration": "Shipping",
+            "SteamAppId": "YourSteamAppId",
+            "SteamDepotId": "YourWindowsDepotId",
+            "Zip": false,
+            "ExtraBuildArguments": "-EnableSteamworks"
+        },
+        {
+            "Name": "PublicWin64Build", 
+            "Platform": "Win64",
+            "Configuration": "Shipping",
+            "ItchAppId": "itch-user/app-name",
+            "ItchChannel": "win64",
+            "Zip": false
+        },
+        {
+            "Name": "PrivateWin64Build", 
+            "Platform": "Win64",
+            "Configuration": "Development",
+            "ItchAppId": "itch-user/private-app-name",
+            "ItchChannel": "win64-dev",
+            "Zip": true,
+            "ExtraBuildArguments": "-Foo=Bar -Something"
+        }
+    ],
+
+    "DefaultVariants": [
+        "PrivateWin64Build"
+    ],
+
+    "SteamLogin": "YourSteamReleaseUser"
+}
+
+
