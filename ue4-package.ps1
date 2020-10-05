@@ -23,6 +23,7 @@ param (
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
 . $PSScriptRoot\inc\ueinstall.ps1
+. $PSScriptRoot\inc\ueeditor.ps1
 
 
 function Write-Usage {
@@ -176,6 +177,11 @@ try {
         if ($src -ne ".") { Pop-Location }
     }
 
+
+    $editorprojname = [System.IO.Path]::GetFileNameWithoutExtension($projfile)
+    Close-UE-Editor $editorprojname $dryrun
+
+    
     $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
