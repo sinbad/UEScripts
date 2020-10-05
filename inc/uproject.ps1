@@ -22,7 +22,7 @@ function Get-Uproject-Filename {
     } else {
         # can return multiple results, pick the first one
         $matchedfile = @(Get-ChildItem -Path $srcfolder -Filter *.uproject)[0]
-        $projfile = Join-Path $srcfolder $matchedfile
+        $projfile = $matchedfile.FullName
     }
 
     # Resolve to absolute (do it here and not in join so missing file is friendlier error)
