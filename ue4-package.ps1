@@ -192,26 +192,26 @@ try {
 
 
         $argList = [System.Collections.ArrayList]@()
-        $argList.Add("-ScriptsForProject=`"$projfile`"")
-        $argList.Add("BuildCookRun")
-        $argList.Add("-nocompileeditor")
-        #$argList.Add("-installed") # don't think we need this, seems to be detected
-        $argList.Add("-nop4")
-        $argList.Add("-project=`"$projfile`"")
-        $argList.Add("-cook")
-        $argList.Add("-stage")
-        $argList.Add("-archive")
-        $argList.Add("-archivedirectory=`"$($outDir)`"")
-        $argList.Add("-package")
-        $argList.Add("-ue4exe=`"$ueEditorCmd`"")
-        $argList.Add("-pak")
-        $argList.Add("-prereqs")
-        $argList.Add("-nodebuginfo")
-        $argList.Add("-build")
-        $argList.Add("-target=$($config.Target)")
-        $argList.Add("-clientconfig=$($variant.Configuration)")
-        $argList.Add("-targetplatform=$($variant.Platform)")
-        $argList.Add("-utf8output")
+        $argList.Add("-ScriptsForProject=`"$projfile`"") > $null
+        $argList.Add("BuildCookRun") > $null
+        $argList.Add("-nocompileeditor") > $null
+        #$argList.Add("-installed")  > $null # don't think we need this, seems to be detected
+        $argList.Add("-nop4") > $null
+        $argList.Add("-project=`"$projfile`"") > $null
+        $argList.Add("-cook") > $null
+        $argList.Add("-stage") > $null
+        $argList.Add("-archive") > $null
+        $argList.Add("-archivedirectory=`"$($outDir)`"") > $null
+        $argList.Add("-package") > $null
+        $argList.Add("-ue4exe=`"$ueEditorCmd`"") > $null
+        $argList.Add("-pak") > $null
+        $argList.Add("-prereqs") > $null
+        $argList.Add("-nodebuginfo") > $null
+        $argList.Add("-build") > $null
+        $argList.Add("-target=$($config.Target)") > $null
+        $argList.Add("-clientconfig=$($variant.Configuration)") > $null
+        $argList.Add("-targetplatform=$($variant.Platform)") > $null
+        $argList.Add("-utf8output") > $null
 
 
         if ($dryrun) {
