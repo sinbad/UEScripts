@@ -21,6 +21,7 @@ param (
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
+. $PSScriptRoot\inc\ueinstall.ps1
 
 
 function Write-Usage {
@@ -107,9 +108,14 @@ try {
     # Import config & project settings
     $config = Read-Package-Config -srcfolder:$src
     $projfile = Get-Uproject-Filename -srcfolder:$src -config:$config
+    $proj = Read-Uproject $projfile
+    $ueVersion = Get-UE-Version $proj
+    $ueinstall = Get-UE-Install $ueVersion
 
     Write-Output ""
-    Write-Output "Project file: $projfile"
+    Write-Output "Project file : $projfile"
+    Write-Output "UE Version   : $ueVersion"
+    Write-Output "UE Install   : $ueinstall"
     Write-Output ""
     Write-Output "Package configuration:"
     Write-Output $config
