@@ -1,5 +1,6 @@
 . $PSScriptRoot\packageconfig.ps1
 
+
 function Get-Uproject-Filename {
     param (
         [string]$srcfolder,
@@ -28,3 +29,23 @@ function Get-Uproject-Filename {
     return Resolve-Path $projfile
 }
 
+# Read the uproject file and return as a PSCustomObject
+# Haven't defined this as a custom class because we don't control it
+function Read-Uproject {
+    param (
+        [string]$uprojectfile
+    )
+
+    # uproject is just JSON
+    return (Get-Content $uprojectfile) | ConvertFrom-Json
+
+}
+
+function Get-UE-Version {
+    param (
+        # the uproject object from Read-Uproject
+        [psobject]$uproject
+    )
+
+    return $uproject.EngineAssociation
+}
