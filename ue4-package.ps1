@@ -1,3 +1,7 @@
+# Packaging helper
+# Bumps versions, builds, cooks, packages variants
+# Put packageconfig.json in your project folder to configure
+# See packageconfig_template.json
 [CmdletBinding()] # Fail on unknown args
 param (
     [string]$src,
@@ -181,7 +185,6 @@ try {
     $editorprojname = [System.IO.Path]::GetFileNameWithoutExtension($projfile)
     Close-UE-Editor $editorprojname $dryrun
 
-    
     $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
@@ -189,7 +192,6 @@ try {
     foreach ($variant in $config.Variants) {
 
         $outDir = Join-Path $config.OutputDir "$versionNumber/$($variant.Name)"
-
 
         $argList = [System.Collections.ArrayList]@()
         $argList.Add("-ScriptsForProject=`"$projfile`"") > $null
@@ -232,8 +234,6 @@ catch {
     Write-Output $_.Exception.Message
     Exit 9
 }
-
-
 
 
 Write-Output "~-~-~ UE4 Packaging Helper Completed OK ~-~-~"
