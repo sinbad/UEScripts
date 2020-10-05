@@ -1,6 +1,10 @@
 Import-Module PsIni
 
 function Get-Project-Version-Ini-Filename {
+    param (
+        [string]$srcfolder
+    )
+
     return Join-Path $srcfolder "Config/DefaultGame.ini" -Resolve
 }
 
@@ -9,7 +13,7 @@ function Get-Project-Version {
         [string]$srcfolder
     )
 
-    $file = Get-Project-Version-Ini-Filename
+    $file = Get-Project-Version-Ini-Filename $srcfolder
     $gameIni = Get-IniContent $file
 
     return $gameIni["/Script/EngineSettings.GeneralProjectSettings"].ProjectVersion
@@ -30,7 +34,7 @@ function Increment-Project-Version {
         throw "Can't set more than one of major/minor/patch/hotfix at the same time!"
     }
 
-    $gameIniFile = Get-Project-Version-Ini-Filename
+    $gameIniFile = Get-Project-Version-Ini-Filename $srcfolder
     $gameIni = Get-IniContent $gameIniFile
 
     Write-Verbose "[version++] M:$major m:$minor p:$patch h:$hotfix"
