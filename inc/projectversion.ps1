@@ -86,9 +86,25 @@ function Increment-Project-Version {
         if ($dryrun) {
             Write-Verbose "[version++] dryrun: not changing $gameIniFile"
         } else {
-            $gameIni["/Script/EngineSettings.GeneralProjectSettings"].ProjectVersion = $newver
-            Out-IniFile -Force -InputObject $gameIni -FilePath $gameIniFile
-            Write-Verbose "[version++] Success! Version is now $newver"
+            # We don't use PsIni to write, because it can screw up some nested non-trivial properties :(
+            #$gameIni["/Script/EngineSettings.GeneralProjectSettings"].ProjectVersion = $newver
+            #Out-IniFile -Force -InputObject $gameIni -FilePath $gameIniFile
+
+            $verlineregex = "ProjectVersion=$regex"
+            $matches = Select-String -Path "$gameIniFile" -Pattern $verlineregex
+        
+            if ($matches.Matches.Count -gt 0) {
+                $origline = $matches.Matches[0].Value
+                $newline = "ProjectVersion=$newver"
+        
+                (Get-Content "$gameIniFile").replace($origline, $newline) | Set-Content "$gameIniFile"
+                Write-Verbose "[version++] Success! Version is now $newver"
+
+            } else {
+                throw "[version++] Error: unable to substitute current version, unable to find '$verlineregex'"
+            }
+
+
         }
 
         return "$newver"
