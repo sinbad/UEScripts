@@ -218,9 +218,11 @@ try {
             Write-Output "Would have run:"
             Write-Output "> $runUAT $($argList -join " ")"
 
-
-
-        } else {
+        } else {            
+            $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
+            if ($proc.ExitCode -ne 0) {
+                throw "RunUAT failed!"
+            }
 
         }
     }
