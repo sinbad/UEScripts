@@ -2,7 +2,9 @@
     "OutputDir": "/Path/To/Output/Parent/Dir",
     "ZipDir": "/Path/To/Zipped/Releases/Folder",
 
-    "Target": "GameName",
+    "ProjectFile": "OptionalProjectFilenameWillDetectInDirOtherwise.uproject",
+
+    "Target": "GameTargetName",
     "CookAllMaps": true,    
     "MapsIncluded": [
     ],

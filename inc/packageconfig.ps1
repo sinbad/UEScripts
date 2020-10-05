@@ -53,6 +53,8 @@ class PackageConfig {
     # Folder to place zipped releases (named $target_$platform_$variant_$version.zip)
     # If relative, will be considered relative to source folder
     [string]$ZipDir
+    # Optional project file name (relative or absolute). If missing will detect .uproject in source folder
+    [string]$ProjectFile
     # Target name: this will usually be the name of your game
     [string]$Target
     # Whether to cook all maps (default true)
@@ -102,8 +104,6 @@ function Read-Package-Config {
     param (
         [string]$srcfolder
     )
-
-    Write-Host "Hello!!!"
 
     $configfile = Resolve-Path "$srcfolder\packageconfig.json"
     if (-not (Test-Path $configfile -PathType Leaf)) {

@@ -20,6 +20,7 @@ param (
 
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
+. $PSScriptRoot\inc\uproject.ps1
 
 
 function Write-Usage {
@@ -45,17 +46,14 @@ if ($src.Length -eq 0) {
     Write-Verbose "-src not specified, assuming current directory"
 }
 
-# Import config
-$config = Read-Package-Config -srcfolder:$src
-
 $ErrorActionPreference = "Stop"
-
-Write-Output "~-~-~ UE4 Packaging Helper Start ~-~-~"
 
 if ($help) {
     Write-Usage
     Exit 0
 }
+
+Write-Output "~-~-~ UE4 Packaging Helper Start ~-~-~"
 
 if ($test) {
     Write-Output "TEST MODE: No tagging, version bumping"
@@ -104,11 +102,19 @@ if (-not $test -and $isGit) {
     if ($src -ne ".") { Pop-Location }
 }
 
-Write-Output ""
-Write-Output "Package configuration:"
-Write-Output $config
 
 try {
+    # Import config & project settings
+    $config = Read-Package-Config -srcfolder:$src
+    $projfile = Get-Uproject-Filename -srcfolder:$src -config:$config
+
+    Write-Output ""
+    Write-Output "Project file: $projfile"
+    Write-Output ""
+    Write-Output "Package configuration:"
+    Write-Output $config
+
+
     if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -eq 0) {
         $patch = $true
     }
@@ -122,7 +128,7 @@ try {
             if (-not $dryrun -and $isGit) {
                 if ($src -ne ".") { Push-Location $src }
 
-                $verIniFile = Get-Project-Version-Ini-Filename
+                $verIniFile = Get-Project-Version-Ini-Filename $src
                 git add "$($verIniFile)"
                 if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
                 git commit -m "Version bump to $mainver"
