@@ -18,6 +18,7 @@ param (
     [switch]$help = $false
 )
 
+. $PSScriptRoot\inc\platform.ps1
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
@@ -111,6 +112,14 @@ try {
     $proj = Read-Uproject $projfile
     $ueVersion = Get-UE-Version $proj
     $ueinstall = Get-UE-Install $ueVersion
+    $exeSuffix = ""
+    $batchSuffix = ".sh"
+    if ($IsWindows) {
+        $exeSuffix = ".exe"
+    }
+    if ($IsWindows) {
+        $batchSuffix = ".bat"
+    }
 
     Write-Output ""
     Write-Output "Project file : $projfile"
@@ -124,20 +133,20 @@ try {
     if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -eq 0) {
         $patch = $true
     }
-    $mainver = $null
+    $versionNumber = $null
     if ($keepversion) {
-        $mainver = Get-Project-Version $src
+        $versionNumber = Get-Project-Version $src
     } else {
         # Bump up version, passthrough options
         try {
-            $mainver = Increment-Project-Version -srcfolder:$src -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix -dryrun:$dryrun
+            $versionNumber = Increment-Project-Version -srcfolder:$src -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix -dryrun:$dryrun
             if (-not $dryrun -and $isGit) {
                 if ($src -ne ".") { Push-Location $src }
 
                 $verIniFile = Get-Project-Version-Ini-Filename $src
                 git add "$($verIniFile)"
                 if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
-                git commit -m "Version bump to $mainver"
+                git commit -m "Version bump to $versionNumber"
                 if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
 
                 if ($src -ne ".") { Pop-Location }
@@ -150,9 +159,9 @@ try {
     }
     # Keep test builds separate
     if ($test) {
-        $mainver = "$mainver-test"
+        $versionNumber = "$versionNumber-test"
     }
-    Write-Output "Next version will be: $mainver"
+    Write-Output "Next version will be: $versionNumber"
 
     # For tagging release
     # We only need to grab the main version once
@@ -162,13 +171,53 @@ try {
     }
     if (-not $test -and -not $dryrun) {
         if ($src -ne ".") { Push-Location $src }
-        git tag $forcearg -a $mainver -m "Automated release tag"
+        git tag $forcearg -a $versionNumber -m "Automated release tag"
         if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
         if ($src -ne ".") { Pop-Location }
     }
 
+    $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
+    $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
-    # TODO: actually package something!
+
+    foreach ($variant in $config.Variants) {
+
+        $outDir = Join-Path $config.OutputDir "$versionNumber/$($variant.Name)"
+
+
+        $argList = [System.Collections.ArrayList]@()
+        $argList.Add("-ScriptsForProject=`"$projfile`"")
+        $argList.Add("BuildCookRun")
+        $argList.Add("-nocompileeditor")
+        #$argList.Add("-installed") # don't think we need this, seems to be detected
+        $argList.Add("-nop4")
+        $argList.Add("-project=`"$projfile`"")
+        $argList.Add("-cook")
+        $argList.Add("-stage")
+        $argList.Add("-archive")
+        $argList.Add("-archivedirectory=`"$($outDir)`"")
+        $argList.Add("-package")
+        $argList.Add("-ue4exe=`"$ueEditorCmd`"")
+        $argList.Add("-pak")
+        $argList.Add("-prereqs")
+        $argList.Add("-nodebuginfo")
+        $argList.Add("-build")
+        $argList.Add("-target=$($config.Target)")
+        $argList.Add("-clientconfig=$($variant.Configuration)")
+        $argList.Add("-targetplatform=$($variant.Platform)")
+        $argList.Add("-utf8output")
+
+
+        if ($dryrun) {
+            Write-Output "Would have run:"
+            Write-Output "> $runUAT $($argList -join " ")"
+
+
+
+        } else {
+
+        }
+    }
 
 }
 catch {
