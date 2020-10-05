@@ -45,6 +45,8 @@ function Cleanup-DLLs($cleanupdir, $projname, $dryrun) {
 
 }
 
+. $PSScriptRoot\inc\ueeditor.ps1
+
 $ErrorActionPreference = "Stop"
 
 if ($help) {
@@ -77,23 +79,7 @@ try {
     # Close UE4 as early as possible
     if (-not $nocloseeditor) {
         # Check if UE4 is running, if so try to shut it gracefully
-        # Filter by project name in main window title, it's always called "Project - Unreal Editor"
-        $ue4proc = Get-Process UE4Editor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojname*" }
-        if ($ue4proc) {
-            if ($dryrun) {
-                Write-Output "UE4 project is currently open in editor, would have closed"
-            } else {
-                Write-Output "UE4 project is currently open in editor, closing..."
-                $ue4proc.CloseMainWindow() > $null 
-                Start-Sleep 5
-                if (!$ue4proc.HasExited) {
-                    throw "Couldn't close UE4 gracefully, aborting!"
-                }
-            }
-        } else {
-            Write-Verbose "UE4 project is not open in editor"
-        }
-        Remove-Variable ue4proc
+        Close-UE-Editor $uprojname $dryrun
 
         # Find all the modules in the project
         $ujson = Get-Content $uprojfile | ConvertFrom-Json
