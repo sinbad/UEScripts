@@ -9,6 +9,12 @@ related to [Unreal Engine 4](https://www.unrealengine.com).
 * [Packaging Builds](#packaging-builds)
 * [Releasing builds to Itch, Steam](#releasing-builds)
 
+## Prerequisites
+
+* Powershell 5.1 or later (preferably Powershell Core 7+)
+* PsIni module installed (library for reading INI files easily)
+   * Run `Install-Module PsIni` in a Powershell console
+
 
 ## Git Setup
 
