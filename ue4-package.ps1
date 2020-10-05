@@ -6,7 +6,7 @@ param (
     [switch]$patch = $false,
     [switch]$hotfix = $false,
     # Don't incrememnt version
-    [switch]$noversionbump = $false,
+    [switch]$keepversion = $false,
     # Force move tag
     [switch]$forcetag = $false,
     # Name of variant to build (optional, uses DefaultVariants from packageconfig.json if unspecified)
