@@ -14,7 +14,7 @@ param (
     # Force move tag
     [switch]$forcetag = $false,
     # Name of variant to build (optional, uses DefaultVariants from packageconfig.json if unspecified)
-    [array]$variant,
+    [array]$variants,
     # Testing mode; skips clean checks, tags
     [switch]$test = $false,
     # Dry-run; does nothing but report what *would* have happened
@@ -42,7 +42,8 @@ function Write-Usage {
     Write-Output "  -hotfix       : Increment hotfix version i.e. x.x.x.[x++]"
     Write-Output "  -keepversion  : Keep current version number, doesn't tag unless -forcetag"
     Write-Output "  -forcetag     : Move any existing version tag"
-    Write-Output "  -variant=Name : Build only a named variant instead of DefaultVariants from packageconfig.json"
+    Write-Output "  -variants Name1,Name2,Name3"
+    Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
@@ -127,6 +128,9 @@ try {
     }
 
     $chosenVariantNames = $config.DefaultVariants
+    if ($variants) {
+        $chosenVariantNames = $variants
+    }
     # TODO support overriding default variants with args
     $chosenVariants = $config.Variants | Where-Object { $chosenVariantNames -contains $_.Name }
 
@@ -199,9 +203,9 @@ try {
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
 
-    foreach ($variant in $chosenVariants) {
+    foreach ($var in $chosenVariants) {
 
-        $outDir = Join-Path $config.OutputDir "$versionNumber/$($variant.Name)"
+        $outDir = Join-Path $config.OutputDir "$versionNumber/$($var.Name)"
 
         $argList = [System.Collections.ArrayList]@()
         $argList.Add("-ScriptsForProject=`"$projfile`"") > $null
@@ -221,12 +225,12 @@ try {
         $argList.Add("-nodebuginfo") > $null
         $argList.Add("-build") > $null
         $argList.Add("-target=$($config.Target)") > $null
-        $argList.Add("-clientconfig=$($variant.Configuration)") > $null
-        $argList.Add("-targetplatform=$($variant.Platform)") > $null
+        $argList.Add("-clientconfig=$($var.Configuration)") > $null
+        $argList.Add("-targetplatform=$($var.Platform)") > $null
         $argList.Add("-utf8output") > $null
 
 
-        Write-Output "Building variant:  $($variant.Name)"
+        Write-Output "Building variant:  $($var.Name)"
 
         if ($dryrun) {
             Write-Output "Would have run:"
