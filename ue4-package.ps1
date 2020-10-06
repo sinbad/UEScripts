@@ -126,10 +126,20 @@ try {
         $batchSuffix = ".bat"
     }
 
+    $chosenVariantNames = $config.DefaultVariants
+    # TODO support overriding default variants with args
+    $chosenVariants = $config.Variants | Where-Object { $chosenVariantNames -contains $_.Name }
+
+    if ($chosenVariants.Count -ne $chosenVariantNames.Count) {
+        $unmatchedVariants = $chosenVariantNames | Where-Object { $chosenVariants.Name -notcontains $_ } 
+        Write-Warning "Unknown variant(s) ignored: $($unmatchedVariants -join ", ")"
+    }
+
     Write-Output ""
-    Write-Output "Project file : $projfile"
-    Write-Output "UE Version   : $ueVersion"
-    Write-Output "UE Install   : $ueinstall"
+    Write-Output "Project file    : $projfile"
+    Write-Output "UE Version      : $ueVersion"
+    Write-Output "UE Install      : $ueinstall"
+    Write-Output "Chosen Variants : $chosenVariantNames"
     Write-Output ""
     Write-Output "Package configuration:"
     Write-Output $config
@@ -189,7 +199,7 @@ try {
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
 
-    foreach ($variant in $config.Variants) {
+    foreach ($variant in $chosenVariants) {
 
         $outDir = Join-Path $config.OutputDir "$versionNumber/$($variant.Name)"
 
@@ -215,6 +225,8 @@ try {
         $argList.Add("-targetplatform=$($variant.Platform)") > $null
         $argList.Add("-utf8output") > $null
 
+
+        Write-Output "Building variant:  $($variant.Name)"
 
         if ($dryrun) {
             Write-Output "Would have run:"
