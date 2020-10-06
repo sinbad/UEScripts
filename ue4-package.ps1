@@ -132,7 +132,9 @@ try {
         Write-Warning "Unknown variant(s) ignored: $($unmatchedVariants -join ", ")"
     }
 
-    $maps = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
+    $foundmaps = Find-Files -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
+
+    $maps = $foundmaps.BaseNames
 
     Write-Output ""
     Write-Output "Project File    : $projfile"

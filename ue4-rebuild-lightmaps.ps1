@@ -17,6 +17,7 @@ param (
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
 . $PSScriptRoot\inc\ueinstall.ps1
+. $PSScriptRoot\inc\filetools.ps1
 
 function Write-Usage {
     Write-Output "Steve's UE4 lightmap rebuilding tool"
@@ -60,17 +61,17 @@ try {
 
     if ($maps) {
         # Explicit list of maps provided on command line
-        $mapsToRebuild = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$false -includeBaseNames:$maps
+        $foundmaps = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$false -includeBaseNames:$maps
 
         if ($mapsToRebuild.Count -ne $maps.Count) {
             Write-Warning "Ignoring missing map(s): $($maps | Where-Object { $_ -notin $mapsToRebuild })"
         }
     } else {
         # Derive maps from cook settings
-        $mapsToRebuild = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
+        $foundmaps = Find-Files -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
     }
 
-    if ($mapsToRebuild.Count -eq 0) {
+    if ($foundmaps.BaseNames.Count -eq 0) {
         throw "No maps found to rebuild"
     }
 
@@ -88,7 +89,7 @@ try {
     Write-Output "UE Version   : $ueVersion"
     Write-Output "UE Install   : $ueinstall"
     Write-Output ""
-    Write-Output "Maps         : $mapsToRebuild"
+    Write-Output "Maps         : $($foundmaps.BaseNames)"
     Write-Output "Quality      : $quality"
     Write-Output ""
 
@@ -103,7 +104,7 @@ try {
     $argList.Add("-AllowCommandletRendering") > $null
     $argList.Add("-SkipSkinVerify") > $null
     $argList.Add("-Quality=$quality") > $null
-    $argList.Add("-Map=$($mapsToRebuild -join "+")") > $null   
+    $argList.Add("-Map=$($foundmaps.BaseNames -join "+")") > $null   
 
     $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
 
