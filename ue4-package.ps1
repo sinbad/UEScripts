@@ -250,6 +250,7 @@ try {
 }
 catch {
     Write-Output $_.Exception.Message
+    Write-Output "~-~-~ UE4 Packaging Helper FAILED ~-~-~"
     Exit 9
 }
 
