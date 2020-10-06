@@ -234,7 +234,7 @@ try {
 
         if ($dryrun) {
             Write-Output "Would have run:"
-            Write-Output "> $runUAT $($argList -join " ")"
+            Write-Output "> $runUAT $($argList -join " ") $($var.ExtraBuildArguments)"
 
         } else {            
             $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
