@@ -230,7 +230,7 @@ try {
         if ($maps.Count) {
             $argList.Add("-Map=$($maps -join "+")") > $null
         }
-        $argList.Add($var.ExtraBuildArguments)
+        $argList.Add($var.ExtraBuildArguments) > $null
 
         Write-Output "Building variant:  $($var.Name)"
 
