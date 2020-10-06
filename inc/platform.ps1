@@ -5,3 +5,13 @@ if (-not $PSVersionTable.Platform) {
     $global:IsLinux = $false
     $global:IsMacOS = $false
 }
+
+
+$exeSuffix = ""
+$batchSuffix = ".sh"
+if ($IsWindows) {
+    $exeSuffix = ".exe"
+}
+if ($IsWindows) {
+    $batchSuffix = ".bat"
+}
