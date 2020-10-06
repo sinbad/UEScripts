@@ -61,12 +61,19 @@ try {
     if ($maps) {
         # Explicit list of maps provided on command line
         $mapsToRebuild = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$false -includeBaseNames:$maps
+
+        if ($mapsToRebuild.Count -ne $maps.Count) {
+            Write-Warning "Ignoring missing map(s): $($maps | Where-Object { $_ -notin $mapsToRebuild })"
+        }
     } else {
         # Derive maps from cook settings
         $mapsToRebuild = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
     }
 
-    # TODO check maps not found
+    if ($mapsToRebuild.Count -eq 0) {
+        throw "No maps found to rebuild"
+    }
+
     # TODO lock map files if read-only
 
     if (-not $quality) {
@@ -114,6 +121,7 @@ try {
 
 } catch {
     Write-Output $_.Exception.Message
+    Write-Output "~-~-~ UE4 Lightmap Rebuild FAILED ~-~-~"
     Exit 9
 
 }
