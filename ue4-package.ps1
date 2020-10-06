@@ -233,7 +233,9 @@ try {
         $argList.Add("-archivedirectory=`"$($outDir)`"") > $null
         $argList.Add("-package") > $null
         $argList.Add("-ue4exe=`"$ueEditorCmd`"") > $null
-        $argList.Add("-pak") > $null
+        if ($config.UsePak) {
+            $argList.Add("-pak") > $null
+        }
         $argList.Add("-prereqs") > $null
         $argList.Add("-nodebuginfo") > $null
         $argList.Add("-build") > $null
