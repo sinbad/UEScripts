@@ -139,14 +139,27 @@ try {
         Write-Warning "Unknown variant(s) ignored: $($unmatchedVariants -join ", ")"
     }
 
+    $maps = [System.Collections.Generic.HashSet[string]]::New()
+    if ($config.CookAllMaps) {
+        Get-ChildItem -Path $(Join-Path $src "Content") -Filter *.umap -Recurse | ForEach-Object { 
+            if ($config.MapsExcluded -notcontains $_.BaseName) {
+                $maps.Add($_.BaseName) 
+            }
+        }
+    } elseif ($config.MapsIncluded) {
+        $config.MapsIncluded | ForEach-Object { $maps.Add($_) }
+    }
+
     Write-Output ""
-    Write-Output "Project file    : $projfile"
+    Write-Output "Project File    : $projfile"
     Write-Output "UE Version      : $ueVersion"
     Write-Output "UE Install      : $ueinstall"
-    Write-Output "Chosen Variants : $chosenVariantNames"
+    Write-Output "Output Folder   : $($config.OutputDir)"
+    Write-Output "Zipped Folder   : $($config.ZipDir)"
     Write-Output ""
-    Write-Output "Package configuration:"
-    Write-Output $config
+    Write-Output "Chosen Variants : $chosenVariantNames"
+    Write-Output "Maps to Cook    : $maps"
+    Write-Output ""
 
 
     if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -eq 0) {
@@ -228,7 +241,9 @@ try {
         $argList.Add("-clientconfig=$($var.Configuration)") > $null
         $argList.Add("-targetplatform=$($var.Platform)") > $null
         $argList.Add("-utf8output") > $null
-
+        if ($maps.Count) {
+            $argList.Add("-Map=$($maps -join "+")") > $null
+        }
 
         Write-Output "Building variant:  $($var.Name)"
 
