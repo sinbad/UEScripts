@@ -238,12 +238,13 @@ try {
         if ($maps.Count) {
             $argList.Add("-Map=$($maps -join "+")") > $null
         }
+        $argList.Add($var.ExtraBuildArguments)
 
         Write-Output "Building variant:  $($var.Name)"
 
         if ($dryrun) {
             Write-Output "Would have run:"
-            Write-Output "> $runUAT $($argList -join " ") $($var.ExtraBuildArguments)"
+            Write-Output "> $runUAT $($argList -join " ")"
 
         } else {            
             $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
