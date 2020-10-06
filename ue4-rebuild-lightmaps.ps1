@@ -19,6 +19,9 @@ param (
 . $PSScriptRoot\inc\ueinstall.ps1
 . $PSScriptRoot\inc\filetools.ps1
 
+# Include Git tools locking
+. $PSScriptRoot\GitScripts\inc\locking.ps1
+
 function Write-Usage {
     Write-Output "Steve's UE4 lightmap rebuilding tool"
     Write-Output "Usage:"
@@ -75,8 +78,6 @@ try {
         throw "No maps found to rebuild"
     }
 
-    # TODO lock map files if read-only
-
     if (-not $quality) {
         $quality = "Production"
     }
@@ -92,6 +93,18 @@ try {
     Write-Output "Maps         : $($foundmaps.BaseNames)"
     Write-Output "Quality      : $quality"
     Write-Output ""
+
+    # lock map files if read-only
+    if ($isGit -and -not $dryrun) {
+        if ($src -ne ".") { Push-Location $src }
+
+        foreach ($mapfullname in $foundmaps.FullNames) {
+            $relativepath = Resolve-Path $mapfullname -Relative
+            Lock-If-Required $relativepath
+            Lock-If-Required $($relativepath -replace ".uasset","_BuiltData.uasset")
+        }
+        if ($src -ne ".") { Pop-Location }
+    }
 
     $argList = [System.Collections.ArrayList]@()
     $argList.Add("`"$projfile`"") > $null
@@ -112,8 +125,9 @@ try {
         Write-Output "Would have run:"
         Write-Output "> $ueEditorCmd $($argList -join " ")"
 
-    } else {            
-        $proc = Start-Process $runUAT $ueEditorCmd -Wait -PassThru -NoNewWindow
+    } else {
+        Write-Output "Starting lighting build; see Swarm Agent for full progress monitoring..."
+        $proc = Start-Process $ueEditorCmd $argList -Wait -PassThru -NoNewWindow
         if ($proc.ExitCode -ne 0) {
             throw "Lightmap build failed!"
         }
@@ -129,3 +143,4 @@ try {
 
 
 Write-Output "~-~-~ UE4 Lightmap Rebuild OK ~-~-~"
+Write-Output "Reminder: You may need to commit and unlock map files"
