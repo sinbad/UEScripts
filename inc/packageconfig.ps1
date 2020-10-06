@@ -65,8 +65,6 @@ class PackageConfig {
     [array]$MapsExcluded
     # Whether to combine assets into a pak file (default true)
     [bool]$UsePak
-    # Whether to compress the pak file (default false since deployments often compress & can detect diffs better)
-    [bool]$CompressPak
     # List of PackageVariant entries
     [array]$Variants
     # Names of the default variant(s) to package / release if unspecified
@@ -76,7 +74,6 @@ class PackageConfig {
         # Construct from JSON object
         $this.CookAllMaps = $true
         $this.UsePak = $true
-        $this.CompressPak = $false
         $this.Variants = @()
 
         # Override just properties that are set
