@@ -28,6 +28,7 @@ param (
 . $PSScriptRoot\inc\uproject.ps1
 . $PSScriptRoot\inc\ueinstall.ps1
 . $PSScriptRoot\inc\ueeditor.ps1
+. $PSScriptRoot\inc\filetools.ps1
 
 
 function Write-Usage {
@@ -139,16 +140,7 @@ try {
         Write-Warning "Unknown variant(s) ignored: $($unmatchedVariants -join ", ")"
     }
 
-    $maps = [System.Collections.Generic.HashSet[string]]::New()
-    if ($config.CookAllMaps) {
-        Get-ChildItem -Path $(Join-Path $src "Content") -Filter *.umap -Recurse | ForEach-Object { 
-            if ($config.MapsExcluded -notcontains $_.BaseName) {
-                $maps.Add($_.BaseName) 
-            }
-        }
-    } elseif ($config.MapsIncluded) {
-        $config.MapsIncluded | ForEach-Object { $maps.Add($_) }
-    }
+    $maps = Find-File-Set -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
 
     Write-Output ""
     Write-Output "Project File    : $projfile"
