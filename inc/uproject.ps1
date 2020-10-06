@@ -8,7 +8,7 @@ function Get-Uproject-Filename {
     )
 
     $projfile = ""
-    if ($config.ProjectFile) {
+    if ($config -and $config.ProjectFile) {
         if (-not [System.IO.Path]::IsPathRooted($config.ProjectFile)) {
             $projfile = Join-Path $srcfolder $config.ProjectFile
         } else {
