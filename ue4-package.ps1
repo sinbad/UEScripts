@@ -119,14 +119,6 @@ try {
     $proj = Read-Uproject $projfile
     $ueVersion = Get-UE-Version $proj
     $ueinstall = Get-UE-Install $ueVersion
-    $exeSuffix = ""
-    $batchSuffix = ".sh"
-    if ($IsWindows) {
-        $exeSuffix = ".exe"
-    }
-    if ($IsWindows) {
-        $batchSuffix = ".bat"
-    }
 
     $chosenVariantNames = $config.DefaultVariants
     if ($variants) {
