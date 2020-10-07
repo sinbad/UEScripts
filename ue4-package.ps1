@@ -232,6 +232,9 @@ try {
         if ($maps.Count) {
             $argList.Add("-Map=$($maps -join "+")") > $null
         }
+        if ($var.Cultures) {
+            $argList.Add("-cookcultures=$($var.Cultures -join "+")") > $null
+        }
         $argList.Add($var.ExtraBuildArguments) > $null
 
         Write-Output "Building variant:  $($var.Name)"

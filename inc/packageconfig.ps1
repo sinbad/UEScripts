@@ -6,6 +6,8 @@ class PackageVariant {
     [string]$Platform
     # Configuration name i.e. Development, Shipping
     [string]$Configuration
+    # List of cultures to cook into this variant. If omitted, use the project packaging settings
+    [array]$Cultures
     # Additional arguments to send to the build command line
     [string]$ExtraBuildArguments
     # Whether to create a zip of this package (default false)

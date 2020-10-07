@@ -21,7 +21,12 @@
             "SteamAppId": "YourSteamAppId",
             "SteamDepotId": "YourWindowsDepotId",
             "Zip": false,
-            "ExtraBuildArguments": "-EnableSteamworks"
+            "ExtraBuildArguments": "-EnableSteamworks",
+            "Cultures": [
+                "en",
+                "fr",
+                "de"
+            ]
         },
         {
             "Name": "PublicWin64Build", 
