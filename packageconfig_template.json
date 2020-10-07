@@ -1,19 +1,33 @@
 {
     "OutputDir": "/Path/To/Output/Parent/Dir",
-    "ZipDir": "/Path/To/Zipped/Releases/Folder",
+    "ZipDir": "/Optional/Path/To/Zipped/Releases/Folder",
 
     "ProjectFile": "OptionalProjectFilenameWillDetectInDirOtherwise.uproject",
 
     "Target": "GameTargetName",
     "CookAllMaps": true,    
     "MapsIncluded": [
+        "IfCookAllMapsIsFalse",
+        "ListMapsToCookHere"
     ],
     "MapsExcluded": [
+        "IfCookAllMapsIsTrue",
+        "ListMapsToExcludeHere"
     ],
     "UsePak": true,
 
+    "DefaultVariants": [
+        "PrivateWin64Build"
+    ],
 
     "Variants": [
+        {
+            "Name": "PrivateWin64Build", 
+            "Platform": "Win64",
+            "Configuration": "Development",
+            "Zip": true,
+            "ExtraBuildArguments": "-Any -Custom -Args=ToRunUAT -OrOtherCommandlets"
+        },
         {
             "Name": "PublicWin64SteamBuild", 
             "Platform": "Win64",
@@ -23,9 +37,9 @@
             "Zip": false,
             "ExtraBuildArguments": "-EnableSteamworks",
             "Cultures": [
-                "en",
-                "fr",
-                "de"
+                "ListOfCulturesToInclude",
+                "IfNotSpecified",
+                "WillUseProjectPackageSettings"
             ]
         },
         {
@@ -35,20 +49,7 @@
             "ItchAppId": "itch-user/app-name",
             "ItchChannel": "win64",
             "Zip": false
-        },
-        {
-            "Name": "PrivateWin64Build", 
-            "Platform": "Win64",
-            "Configuration": "Development",
-            "ItchAppId": "itch-user/private-app-name",
-            "ItchChannel": "win64-dev",
-            "Zip": true,
-            "ExtraBuildArguments": "-Foo=Bar -Something"
         }
-    ],
-
-    "DefaultVariants": [
-        "PrivateWin64Build"
     ],
 
     "SteamLogin": "YourSteamReleaseUser"
