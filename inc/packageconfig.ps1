@@ -12,6 +12,8 @@ class PackageVariant {
     [string]$ExtraBuildArguments
     # Whether to create a zip of this package (default false)
     [bool]$Zip
+    # List of services this variant should be released to ("steam", "itch" currently supported)
+    [array]$ReleaseTo
     # The Steam application ID, if you intend to send this variant to Steam
     [string]$SteamAppId
     # The Steam depot ID, if you intend to send this variant to Steam

@@ -32,8 +32,12 @@
             "Name": "PublicWin64SteamBuild", 
             "Platform": "Win64",
             "Configuration": "Shipping",
+            "ReleaseTo": [
+                "Steam"
+            ],
             "SteamAppId": "YourSteamAppId",
             "SteamDepotId": "YourWindowsDepotId",
+            "SteamLogin": "YourSteamReleaseUser",
             "Zip": false,
             "ExtraBuildArguments": "-EnableSteamworks",
             "Cultures": [
@@ -46,13 +50,16 @@
             "Name": "PublicWin64Build", 
             "Platform": "Win64",
             "Configuration": "Shipping",
+            "ReleaseTo": [
+                "Itch",
+                "SomeOtherService"
+            ],
             "ItchAppId": "itch-user/app-name",
             "ItchChannel": "win64",
             "Zip": false
         }
     ],
 
-    "SteamLogin": "YourSteamReleaseUser"
 }
 
 

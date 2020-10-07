@@ -29,3 +29,41 @@ function Find-Files {
     }
 
 }
+
+# Get the root package output dir for a version / variant
+function Get-Package-Dir {
+    param (
+        [PackageConfig]$config,
+        [string]$versionNumber,
+        [string]$variantName
+    )
+
+    return Join-Path $config.OutputDir "$versionNumber/$variantName"
+}
+
+# Get the dir where the client build is for a packaged version / variant
+# This is as Get-Package-Dir except with one extra level e.g. WindowsNoEditor
+function Get-Package-Client-Dir {
+    param (
+        [PackageConfig]$config,
+        [string]$versionNumber,
+        [string]$variantName
+    )
+
+    $root = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$variantName
+    $variant = $config.Variants | Where-Object { $_.Name -eq $variantName } | Select-Object -First 1
+
+    if (-not $variant) {
+        throw "Unknown variant $variantName"
+    }
+    # Note, currently only supporting "Game" platform type, not separate client / server
+    $subfolder = switch ($variant.Platform) {
+        "Win32" { "WindowsNoEditor" }
+        "Win64" { "WindowsNoEditor" }
+        "Linux" { "LinuxNoEditor" }
+        "Mac" { "MacNoEditor" }
+        Default { throw "Unsupported platform $($variant.Platform)" }
+    }
+
+    return Join-Path $root $subfolder
+}

@@ -204,7 +204,7 @@ try {
 
     foreach ($var in $chosenVariants) {
 
-        $outDir = Join-Path $config.OutputDir "$versionNumber/$($var.Name)"
+        $outDir = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$var.Name
 
         $argList = [System.Collections.ArrayList]@()
         $argList.Add("-ScriptsForProject=`"$projfile`"") > $null
