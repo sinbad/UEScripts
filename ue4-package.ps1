@@ -240,8 +240,10 @@ try {
         Write-Output "Building variant:  $($var.Name)"
 
         if ($dryrun) {
+            Write-Output ""
             Write-Output "Would have run:"
             Write-Output "> $runUAT $($argList -join " ")"
+            Write-Output ""
 
         } else {            
             $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
@@ -249,6 +251,33 @@ try {
                 throw "RunUAT failed!"
             }
 
+        }
+
+        if ($var.Zip) {
+            if ($dryrun) {
+                Write-Output "Would have compressed $outdir to $(Join-Path $config.ZipDir "$($config.Target)_$($versionNumber)_$($var.Name).zip")"
+            } else {
+                # We zip all subfolders of the out dir separately
+                # Since there may be multiple build dirs in the case of server & client builds
+                # E.g. WindowsNoEditor vs WindowsServer
+                # BUT we omit the folder name in the zip if there's only one, for brevity         
+                $subdirs = @(Get-ChildItem $outdir)
+                $multipleBuilds = ($subdirs.Count > 1)
+                $subdirs | ForEach-Object {
+                    $zipsrc = "$($_.FullName)\*" # excludes folder name, compress contents
+                    $subdirSuffix = ""
+                    if ($multipleBuilds) {
+                        # Only include "WindowsNoEditor" etc part if there's a need to disambiguate
+                        $subdirSuffix = "_$($_.BaseName)"
+                    }
+                    $zipdst = Join-Path $config.ZipDir "$($config.Target)_$($versionNumber)_$($var.Name)$subdirSuffix.zip"
+
+                    New-Item -ItemType Directory -Path $config.ZipDir -Force > $null
+                    Write-Output "Compressing to $zipdst"
+                    Compress-Archive -Path $zipsrc -DestinationPath $zipdst
+                }
+
+            }
         }
     }
 
