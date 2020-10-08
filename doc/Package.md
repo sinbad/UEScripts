@@ -23,6 +23,12 @@ for a full description of this file.
   -test         : Testing mode, separate builds, allow dirty working copy
   -dryrun       : Don't perform any actual actions, just report on what you would do
   -help         : Print this help
+
+Environment Variables:
+  UE4INSTALL   : Use a specific UE4 install.
+               : Default is to find one based on project version, under UE4ROOT
+  UE4ROOT      : Parent folder of all binary UE4 installs (detects version).
+               : Default C:\Program Files\Epic Games
 ```
 
 ## What the Script Does

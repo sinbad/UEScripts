@@ -48,6 +48,13 @@ function Write-Usage {
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
+    Write-Output " "
+    Write-Output "Environment Variables:"
+    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
+    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
+    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
+    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output " "
 }
 
 if ($src.Length -eq 0) {
