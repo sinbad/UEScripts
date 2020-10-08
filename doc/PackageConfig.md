@@ -2,11 +2,12 @@
 
 ## Overview
 
-Many of the tools in this repo, such as `ue4-package.ps1` and `ue4-release.ps1`
-depend on a configuration file `packageconfig.json`.
+Many of the tools in this repo, such as the [Packaging Script](./Package.md)
+and the [Release Script](./Release.md), depend on a configuration file named
+`packageconfig.json`.
 
-This file should be in the root of your UE4 project. Details of its contents
-are below, but here's an example demonstrating many of the features:
+This file should be in the root of your UE4 project. It's contents are set out
+in detail later in this document, but but here's an example demonstrating many of the features:
 
 ```json
 {
@@ -152,5 +153,60 @@ want to package, or name one or more on the command line explicitly.
 
  Each entry has these properties:
 
+### `Name`
+*Mandatory Setting - string*
 
+The name of the variant. This can be whatever you want, it just identifies this
+variant and also forms the basis of folder / filenames related to its packaging.
 
+### `Platform`
+*Mandatory Setting - string*
+
+The platform this variant will be built for; must be one of those supported by
+Unreal, e.g. "Win64", "Linux" etc
+
+### `Configuration`
+*Mandatory Setting - string*
+
+The build configuration for this variant as defined by UE4, e.g. "Development" or "Shipping".
+
+### `ExtraBuildArguments`
+*Optional Setting - string*
+
+If you need to supply any additional arguments to the build / packaging step for
+this variant, you can include them here (as one combined string).
+
+### `Zip`
+*Optional setting - boolean: Default=false*
+
+Set this option to true if you would like this packaged build to be zipped up
+into an archive. It will be placed in the [`ZipDir`](#zipdir) folder, see the 
+[Packaging Script](./Package.md) for more details about naming.
+
+### `ReleaseTo`
+*Optional Setting - array of strings*
+
+Which services you want to be able to release this package to. Currently the
+only supported options are "Itch" and "Steam". You can list more than one on the
+same variant if the same build is released to multiple stores.
+
+Packaged builds are released using the [Release Script](./Release.md) which uses
+this setting.
+
+Each of the release stores has its own set of additional parameters which 
+you'll need to also provide in the variant:
+
+#### Steam:
+* `SteamAppId`: the application ID of your app on Steam (numeric string)
+* `SteamDepotId`: the depot ID for this particular variant (numeric string)
+* `SteamLogin`: the username which you use to upload (string)
+
+#### Itch
+* `ItchAppId`: the application identifier on Itch e.g. "username/app"
+* `ItchChannel`: the channel to publish this variant on e.g. "windows"
+
+### `Cultures`
+*Optional Setting - array of strings*
+
+If supplied, cooks a specific set of cultures (e.g. "en-us") into this particular
+variant. If not supplied, the project packaging settings are used.
