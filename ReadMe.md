@@ -20,6 +20,8 @@ automation tools assume P4, which can be inconvenient).
   * Almost everything is compatible with Win10 built-in PS 5.1 but 7 is better, and platform independent
 * PsIni module installed (library for reading INI files easily)
    * Run `Install-Module PsIni` in a Powershell console
+* Itch's [`butler` tool](https://itch.io/docs/butler/) if you wish to release to Itch.io
+* The [Steamworks SDK](https://partner.steamgames.com/doc/sdk) if you wish to release on Steam
 
 
 If these tools are useful, please consider :heart: **[Supporting my work on Patreon!](https://www.patreon.com/stevestreeting)**
