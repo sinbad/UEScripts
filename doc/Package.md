@@ -11,7 +11,7 @@ for a full description of this file.
 ```
   ue4-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]
 
-  -src          : Source folder (current folder if omitted), must contain buildconfig.json
+  -src          : Source folder (current folder if omitted), must contain packageconfig.json
   -major        : Increment major version i.e. [x++].0.0.0
   -minor        : Increment minor version i.e. x.[x++].0.0
   -patch        : Increment patch version i.e. x.x.[x++].0 (default)
