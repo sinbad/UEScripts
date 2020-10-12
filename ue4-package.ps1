@@ -36,7 +36,7 @@ function Write-Usage {
     Write-Output "Usage:"
     Write-Output "  ue4-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
     Write-Output " "
-    Write-Output "  -src          : Source folder (current folder if omitted), must contain buildconfig.json"
+    Write-Output "  -src          : Source folder (current folder if omitted), must contain packageconfig.json"
     Write-Output "  -major        : Increment major version i.e. [x++].0.0.0"
     Write-Output "  -minor        : Increment minor version i.e. x.[x++].0.0"
     Write-Output "  -patch        : Increment patch version i.e. x.x.[x++].0 (default)"
