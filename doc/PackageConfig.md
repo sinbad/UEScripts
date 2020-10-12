@@ -98,13 +98,18 @@ the of [PackageVariant](#package-variants) documentation below for more details.
 
 
 ### `CookAllMaps`
-*Optional Setting - boolean: Default=true*
+*Optional Setting - boolean: Default=false*
 
-If true, all `.umap` files in your Content folder will be added to the list to
-cook when packaging. You can exclude some using the [`MapsExcluded`](#mapsexcluded)
+If true, script will locate all `.umap` files in your Content folder and cook 
+then when packaging. You can exclude some using the [`MapsExcluded`](#mapsexcluded)
 option if you need to.
 
-If false, only maps listed in [`MapsIncluded`](#mapsincluded) will be cooked.
+If false, either  the contents of [`MapsIncluded`](#mapsincluded) will be cooked,
+or if that isn't specified, the maps to cook in your project packaging settings
+(DefaultGame.ini) will be used.
+
+So if you set this to false and don't provide `MapsIncluded` then your project
+settings continue to control the maps which are cooked.
 
 ### `MapsExcluded`
 *Optional Setting - array of strings*
@@ -116,8 +121,8 @@ the map file, just the map name.
 ### `MapsIncluded`
 *Optional Setting - array of strings*
 
-If [`CookAllMaps`](#cookallmaps) is false, the only maps that will be cooked are
-those explicitly listed in this array. Do not include the folder name or extension of
+If [`CookAllMaps`](#cookallmaps) is false and you include this setting, 
+only the maps listed here will be cooked. Do not include the folder name or extension of
 the map file, just the map name.
 
 ### `DefaultVariants`

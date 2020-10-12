@@ -76,7 +76,7 @@ class PackageConfig {
 
     PackageConfig([PSCustomObject]$obj) {
         # Construct from JSON object
-        $this.CookAllMaps = $true
+        $this.CookAllMaps = $false
         $this.UsePak = $true
         $this.Variants = @()
 

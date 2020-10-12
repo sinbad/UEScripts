@@ -143,6 +143,8 @@ try {
 
     $maps = $foundmaps.BaseNames
 
+    $mapsdesc = $maps ? $maps -join ", " : "Default (Project Settings)"
+
     Write-Output ""
     Write-Output "Project File    : $projfile"
     Write-Output "UE Version      : $ueVersion"
@@ -151,7 +153,7 @@ try {
     Write-Output "Zipped Folder   : $($config.ZipDir)"
     Write-Output ""
     Write-Output "Chosen Variants : $chosenVariantNames"
-    Write-Output "Maps to Cook    : $maps"
+    Write-Output "Maps to Cook    : $mapsdesc"
     Write-Output ""
 
 
