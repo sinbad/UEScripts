@@ -1,7 +1,9 @@
 [CmdletBinding()] # Fail on unknown args
 param (
-    # Version to release
+    # Explicit version to release
     [string]$version,
+    # Latest version option instead of explicit version
+    [switch]$latest,
     # Variant name(s) to release; if not specified release all DefaultVariants with ReleaseTo options
     [array]$variants,
     # Source folder, current dir if omitted
@@ -15,6 +17,7 @@ param (
 
 . $PSScriptRoot\inc\platform.ps1
 . $PSScriptRoot\inc\packageconfig.ps1
+. $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\filetools.ps1
 . $PSScriptRoot\inc\steam.ps1
 . $PSScriptRoot\inc\itch.ps1
@@ -23,9 +26,10 @@ param (
 function Write-Usage {
     Write-Output "Steve's UE4 release tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-release.ps1 -version:ver -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
+    Write-Output "  ue4-release.ps1 [-version:ver|-latest] -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
     Write-Output " "
     Write-Output "  -version:ver        : Version to release; must have been packaged already"
+    Write-Output "  -latest             : Instead of an explicit version, release one identified in project settings"
     Write-Output "  -variants:var1,var2 : Name of variants to release. Omit to use DefaultVariants"
     Write-Output "  -services:s1,s2     : Name of services to release to. Can omit and rely on ReleaseTo"
     Write-Output "                        setting of variant in packageconfig.json "
@@ -46,8 +50,17 @@ if ($src.Length -eq 0) {
     Write-Verbose "-src not specified, assuming current directory"
 }
 
-if (-not $version) {
-    Write-Output "Mandatory argument: version"
+if (-not $version -and -not $latest) {
+    Write-Usage
+    Write-Output ""
+    Write-Output "ERROR: You must specify a version"
+    Exit 1
+}
+
+if ($version -and $latest) {
+    Write-Usage
+    Write-Output ""
+    Write-Output "ERROR: You cannot specify a -version and -latest at the same time"
     Exit 1
 }
 
@@ -57,6 +70,10 @@ try {
 
     # Import config
     $config = Read-Package-Config -srcfolder:$src
+
+    if ($latest) {
+        $version = Get-Project-Version $src
+    }
 
     if ($variants) {
         $variantConfigs = $config.Variants | Where-Object { $_.Name -in $variants }
@@ -100,6 +117,7 @@ try {
 
         Write-Output ""
         Write-Output "Variant         : $($variantConfig.Name)"
+        Write-Output "Version         : $version"
         Write-Output "Source Folder   : $sourcedir"
         Write-Output "Service(s)      : $($servicesFound -join ", ")"
         Write-Output ""

@@ -11,9 +11,10 @@ release on Itch.
 This script uses configuration stored in [`packageconfig.json`](./PackageConfig.md).
 
 ```
-  ue4-release.ps1 -version:ver -variants:v1,v2 -services:steam,itch [-src:sourcefolder] [-dryrun]
+  ue4-release.ps1 [-version:ver|-latest] -variants:v1,v2 -services:steam,itch [-src:sourcefolder] [-dryrun]
 
   -version:ver        : Version to release; must have been packaged already
+  -latest             : Instead of an explicit version, release one identified in project settings  
   -variants:var1,var2 : Name of variants to release. Omit to use DefaultVariants
   -services:s1,s2     : Name of services to release to. Can omit and rely on ReleaseTo
                         setting of variant in packageconfig.json
@@ -25,7 +26,8 @@ This script uses configuration stored in [`packageconfig.json`](./PackageConfig.
 
 ## Uploading all builds at once
 
-The only mandatory argument is the version number. With only that argument, 
+The only mandatory argument is the version number, which you can specify explicitly, 
+or use the `-latest` option to take the version from project settings. With only that argument, 
 the script will process all the [default variants](./PackageConfig.md#defaultvariants)
 for this project and release any which have [release settings](./PackageConfig.md#defaultvariants).
 This allows you to push all your builds for a given version at once.
