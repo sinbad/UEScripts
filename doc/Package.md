@@ -21,6 +21,7 @@ for a full description of this file.
   -variants Name1,Name2,Name3
                 : Build only named variants instead of DefaultVariants from packageconfig.json
   -test         : Testing mode, separate builds, allow dirty working copy
+  -browse       : After packaging, browse the output folder
   -dryrun       : Don't perform any actual actions, just report on what you would do
   -help         : Print this help
 
@@ -118,3 +119,7 @@ more than one subfolder in the package folder, which is only the case when you
 build a dedicated client & server. In that case there will be separate zips for
 each, e.g. `MyGame_1.1.2.0_PublicSteamWin64_WindowsClient.zip` and `MyGame_1.1.2.0_PublicSteamWin64_WindowsServer.zip`
 
+### 10. Optionally Browse Packaged Output
+
+If you supply the optional argument `-browse`, your file manager will be asked to
+open the folder containing the newly packaged output, if it completed successfully.

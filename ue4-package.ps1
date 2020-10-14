@@ -17,6 +17,8 @@ param (
     [array]$variants,
     # Testing mode; skips clean checks, tags
     [switch]$test = $false,
+    # Browse the output directory in file explorer after packaging
+    [switch]$browse = $false,
     # Dry-run; does nothing but report what *would* have happened
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -46,6 +48,7 @@ function Write-Usage {
     Write-Output "  -variants Name1,Name2,Name3"
     Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
+    Write-Output "  -browse       : After packaging, browse the output folder"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
     Write-Output " "
@@ -290,12 +293,15 @@ try {
         }
     }
 
+    if ($browse -and -not $dryrun) {
+        Invoke-Item $(Join-Path $config.OutputDir $versionNumber)
+    }
+
 }
 catch {
     Write-Output $_.Exception.Message
     Write-Output "~-~-~ UE4 Packaging Helper FAILED ~-~-~"
     Exit 9
 }
-
 
 Write-Output "~-~-~ UE4 Packaging Helper Completed OK ~-~-~"
