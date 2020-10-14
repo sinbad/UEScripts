@@ -71,15 +71,22 @@ function Increment-Project-Version {
 
         }
 
+        $versionDigit = 2;
         if ($major) {
-            $intversions[0]++
+            $versionDigit = 0
         } elseif ($minor) {
-            $intversions[1]++
+            $versionDigit = 1
         } elseif ($patch) {
-            $intversions[2]++
-        } else {
-            $intversions[3]++
+            $versionDigit = 2
+        } elseif ($minor) {
+            $versionDigit = 3
         }
+        # increment then zero anything after
+        $intversions[$versionDigit]++
+        for ($d = $versionDigit + 1; $d -lt $intversions.Length; $d++) {
+            $intversions[$d] = 0
+        }
+
         $newver = "$prefix$($intversions[0]).$($intversions[1]).$($intversions[2]).$($intversions[3])$postfix"
         Write-Verbose "[version++] Bumping version to $newver"
 
