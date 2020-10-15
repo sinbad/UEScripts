@@ -159,6 +159,11 @@ try {
     Write-Output "Maps to Cook    : $mapsdesc"
     Write-Output ""
 
+    if (-not $dryrun)
+    {
+        $editorprojname = [System.IO.Path]::GetFileNameWithoutExtension($projfile)
+        Close-UE-Editor $editorprojname $dryrun
+    }
 
     if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -eq 0) {
         $patch = $true
@@ -205,10 +210,6 @@ try {
         if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
         if ($src -ne ".") { Pop-Location }
     }
-
-
-    $editorprojname = [System.IO.Path]::GetFileNameWithoutExtension($projfile)
-    Close-UE-Editor $editorprojname $dryrun
 
     $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
