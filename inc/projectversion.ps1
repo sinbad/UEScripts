@@ -78,7 +78,7 @@ function Increment-Project-Version {
             $versionDigit = 1
         } elseif ($patch) {
             $versionDigit = 2
-        } elseif ($minor) {
+        } elseif ($hotfix) {
             $versionDigit = 3
         }
         # increment then zero anything after
