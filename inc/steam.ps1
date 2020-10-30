@@ -92,10 +92,10 @@ function Release-Steam {
 
     if ($dryrun) {
         Write-Output "Would have run Steam command:"
-        Write-Output " > steamcmd +login $($config.SteamLogin) +run_app_build_http $appfile +quit"
+        Write-Output " > steamcmd +login $($login) +run_app_build_http $appfile +quit"
     } else {
         Write-Output "Releasing version $version to Steam ($appid)"
-        steamcmd +login $($config.SteamLogin) +run_app_build_http $appfile +quit
+        steamcmd +login $($login) +run_app_build_http $appfile +quit
         if (!$?) {
             throw "Steam upload tool failed!"
         }
