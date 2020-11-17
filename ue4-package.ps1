@@ -200,15 +200,17 @@ try {
 
     # For tagging release
     # We only need to grab the main version once
-    $forcearg = ""
-    if ($forcetag) {
-        $forcearg = "-f"
-    }
-    if (-not $test -and -not $dryrun) {
-        if ($src -ne ".") { Push-Location $src }
-        git tag $forcearg -a $versionNumber -m "Automated release tag"
-        if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
-        if ($src -ne ".") { Pop-Location }
+    if ((-not $keepversion) -or $forcetag) {
+        $forcearg = ""
+        if ($forcetag) {
+            $forcearg = "-f"
+        }
+        if (-not $test -and -not $dryrun) {
+            if ($src -ne ".") { Push-Location $src }
+            git tag $forcearg -a $versionNumber -m "Automated release tag"
+            if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
+            if ($src -ne ".") { Pop-Location }
+        }
     }
 
     $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
