@@ -58,6 +58,8 @@ $result = 0
 try {
     if ($src -ne ".") { Push-Location $src }
 
+    Write-Output "-- Build process starting --"
+
     # Locate UE4 project file
     $uprojfile = Get-ChildItem *.uproject | Select-Object -expand Name
     if (-not $uprojfile) {
@@ -131,31 +133,10 @@ try {
     } else {
         Write-Verbose "Running $buildbat $buildargs"
 
-        $pinfo = New-Object System.Diagnostics.ProcessStartInfo
-        $pinfo.FileName = $buildbat
-        $pinfo.RedirectStandardError = $true
-        $pinfo.RedirectStandardOutput = $true
-        $pinfo.UseShellExecute = $false
-        $pinfo.Arguments = $buildargs
-        $process = New-Object System.Diagnostics.Process
-        $process.StartInfo = $pinfo
-        $process.Start() | Out-Null
-
-        Write-Host "UE4 Build: " -NoNewline
-        do {
-            Write-Host "." -NoNewline
-            start-sleep -Milliseconds 1000
-        } until ($process.HasExited)
-        Write-Host "."
-
-        if ($process.ExitCode -ne 0) {
-            $code = $process.ExitCode
-            Write-Output $process.StandardOutput.ReadToEnd()
-            Write-Output $process.StandardError.ReadToEnd()
+        $proc = Start-Process $buildbat $buildargs -Wait -PassThru -NoNewWindow
+        if ($proc.ExitCode -ne 0) {
+            $code = $proc.ExitCode
             throw "*** Build exited with code $code, see above"
-        } else {
-            Write-Verbose $process.StandardOutput.ReadToEnd()           
-            Write-Output "---- UE4 Build OK ----"
         }
     }
 
