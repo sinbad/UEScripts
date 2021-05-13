@@ -67,3 +67,33 @@ function Get-Package-Client-Dir {
 
     return Join-Path $root $subfolder
 }
+
+# Return whether 2 files seem to be the same based on their size and date/time
+# Does not compare their contents!
+function Compare-Files-Quick {
+    param (
+        [string]$filePathA,
+        [string]$filePathB
+    )
+
+    if (-not (Test-Path $filePathA -PathType Leaf)) {
+        return $false
+    }
+    if (-not (Test-Path $filePathB -PathType Leaf)) {
+        return $false
+    }
+    $propsA = Get-ItemProperty -Path $filePathA
+    $propsB = Get-ItemProperty -Path $filePathB
+
+    if ($propsA.Length -ne $propsB.Length) {
+        return $false
+    }
+
+    $timediff = New-TimeSpan $propsA.LastWriteTime $propsB.LastWriteTime
+    # Allow a 2s difference
+    if ($timediff.Seconds -gt 2) {
+        return $false
+    }
+
+    return $true
+}
