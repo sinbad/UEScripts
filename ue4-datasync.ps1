@@ -89,27 +89,21 @@ if (-not $umapsOK) {
     Exit 5
 }
 
-# Check no changes
-git diff --no-patch --exit-code
-if ($LASTEXITCODE -ne 0) {
-    Write-Output "Working copy is not clean (unstaged changes)"
-    if ($dryrun) {
-        Write-Output "dryrun: Continuing but this will fail without -dryrun"
-    } else {
-        Exit $LASTEXITCODE
+# Check no changes, ONLY to .umap files
+$statusOutput = git status --porcelain *.umap
+foreach ($line in $statusOutput) {
+    if ($line -like "*.umap*") {
+        Write-Output "Uncommitted changes to .umap file(s) detected"
+        if ($dryrun) {
+            Write-Output "dryrun: Continuing but this will fail without -dryrun"
+            break
+        } else {
+            Write-Output "Cannot continue"
+            Exit $LASTEXITCODE
+        }
+    
     }
 }
-git diff --no-patch --cached --exit-code
-if ($LASTEXITCODE -ne 0) {
-    Write-Output "Working copy is not clean (staged changes)"
-    if ($dryrun) {
-        Write-Output "dryrun: Continuing but this will fail without -dryrun"
-    } else {
-        Exit $LASTEXITCODE
-    }
-}
-
-
 
 $result = 0
 
