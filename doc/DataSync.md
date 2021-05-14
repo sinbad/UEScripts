@@ -116,7 +116,14 @@ umap files on the shared drive. Again, you can't have any uncommitted changes to
 umap files.
 
 In the same way as push, the script uses the OID of the umap file to look up 
-the versions on the shared drive. If the matching OID file exists, and
+the versions on the shared drive. However, if a lighting build with that
+OID doesn't exist, pull checks the git log and finds the latest lighting build 
+available for that umap file. This is to deal with the case where changes have
+been made to the umap file since the last lighting build, but the lighting build
+is still OK to use (either the umap changes didn't affect lighting, or the 
+differences are "good enough" for the moment). 
+
+If an appropriate BuiltData file is found on the shared drive, and
 you don't have a newer local version, then the BuiltData file is copied into
 place in your local project folder. Next time you open the editor you'll 
 have the lighting data that your team mate built.

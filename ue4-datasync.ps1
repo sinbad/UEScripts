@@ -57,6 +57,23 @@ function Get-Current-Umaps {
     }
 }
 
+function Get-Remote-Builtdata-Path {
+    param (
+        [string]$filename,
+        [string]$oid,
+        [string]$syncdir
+    )
+
+    $subdir = [System.IO.Path]::GetDirectoryName($filename)
+    $basename = [System.IO.Path]::GetFileNameWithoutExtension($filename)
+
+    $remotesubdir = Join-Path $syncdir $subdir
+    $remotebuiltdata = Join-Path $remotesubdir "${basename}_BuiltData_${oid}.uasset"
+
+    return $remotebuiltdata
+
+}
+
 function Get-Builtdata-Paths {
     param (
         [object]$umap,
@@ -215,8 +232,47 @@ try {
             # In pull mode, we always pull if not same, or forced (checked already above)
 
             if (-not (Test-Path $remotebuiltdata -PathType Leaf)) {
-                Write-Warning "Skipping $filename, remote file missing"
-                continue
+
+                # If we don't have lighting data for this specific OID, we
+                # look back at the file history of the umap and use the latest
+                # one that does exist instead. E.g. lighting build may have been done, then
+                # small changes made to the umap afterward which would stop it matching
+                # but the lighting build for the previous OID was fine
+                # We don't use the latest file because that could be ahead of us
+                $foundInHistory = $false
+                $logOutput = git log -p --oneline -- $filename
+                Write-Verbose "No data for $filename HEAD revision, checking for latest available"
+                foreach ($line in $logOutput) {
+                    if ($line -match "^\+oid sha256:([0-9a-f]*)$") {
+                        $logoid = $matches[1]
+
+                        # Ignore the latest one, we've already tried
+                        if ($logoid -ne $oid) {
+                            $testremotefile = Get-Remote-Builtdata-Path $filename $logoid $syncdir
+
+                            if (Test-Path $testremotefile -PathType Leaf) {
+                                $foundInHistory = $true
+                                $remotebuiltdata = $testremotefile
+                                $oid = $logoid
+                                Write-Verbose "Found latest for $filename ($logoid)"
+                                break
+                            }
+                        }
+                    }
+                }
+
+                if ($foundInHistory) {
+                    $same = Compare-Files-Quick $localbuiltdata $remotebuiltdata
+
+                    if ($same -and -not $force) {
+                        Write-Verbose "Skipping $filename, matches"
+                        continue
+                    }
+            
+                } else {
+                    Write-Warning "Skipping $filename, remote file missing"
+                    continue
+                }
             }
 
             if ($dryrun) {
@@ -226,7 +282,6 @@ try {
                 New-Item -ItemType Directory $subdir -Force > $null
                 Copy-Item $remotebuiltdata $localbuiltdata    
             }
-
         }
     }
 
