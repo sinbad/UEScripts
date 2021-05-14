@@ -279,7 +279,8 @@ try {
                 Write-Output "Would have pulled: $filename ($oid)"
             } else {
                 Write-Output "Pull: $filename ($oid)"
-                New-Item -ItemType Directory $subdir -Force > $null
+                $subdir = [System.IO.Path]::GetDirectoryName($localbuiltdata)
+                New-Item -ItemType Directory -Path $subdir -Force > $null
                 Copy-Item $remotebuiltdata $localbuiltdata    
             }
         }
