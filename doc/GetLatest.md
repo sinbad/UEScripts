@@ -4,6 +4,9 @@ We've found it useful to provide a simple script which can be run on artists'
 machines to get the latest from Git, and make sure all the C++ components are
 built. 
 
+It now also automatically calls `ue4-datasync.ps1 pull` if `UE4SYNCROOT` is defined
+in the environment.
+
 While the UE editor can sometimes do this successfully on startup as well,
 it's just nicer to do it as part of the update process - the artist can then 
 just double-click a shortcut on their desktop and let it run while getting

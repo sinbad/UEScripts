@@ -114,18 +114,32 @@ try {
     }
 
     # Now build
-    $args = @()
+    $cmdargs = @()
     if ($nocloseeditor) {
-        $args += "-nocloseeditor"
+        $cmdargs += "-nocloseeditor"
     }
     if ($dryrun) {
-        $args += "-dryrun"
+        $cmdargs += "-dryrun"
     }
     # Use Invoke-Expression so we can use a string as options
-    Invoke-Expression "&'$PSScriptRoot/ue4-build.ps1' dev $args"
+    Invoke-Expression "&'$PSScriptRoot/ue4-build.ps1' dev $cmdargs"
 
     if ($LASTEXITCODE -ne 0) {
         throw "Build process failed, see above"
+    }
+
+    # Automatically pull lighting builds, if environment variable defined
+    if ($Env:UE4SYNCROOT) {
+        $cmdargs = @()
+        if ($nocloseeditor) {
+            $cmdargs += "-nocloseeditor"
+        }
+        if ($dryrun) {
+            $cmdargs += "-dryrun"
+        }
+        # Use Invoke-Expression so we can use a string as options
+        Invoke-Expression "&'$PSScriptRoot/ue4-datasync.ps1' pull $cmdargs"
+    
     }
 
     Write-Output "-- Get Latest finished OK --"
