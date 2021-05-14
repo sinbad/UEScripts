@@ -222,8 +222,8 @@ try {
                 Write-Output "Would have pushed: $filename ($oid)"
             } else {
                 Write-Output "Push: $filename ($oid)"
-
-                New-Item -ItemType Directory [System.IO.Path]::GetDirectoryName($remotebuiltdata) -Force > $null
+                $remotedir = [System.IO.Path]::GetDirectoryName($remotebuiltdata)
+                New-Item -ItemType Directory -Path $remotedir -Force > $null
                 Copy-Item $localbuiltdata $remotebuiltdata    
             }
 
