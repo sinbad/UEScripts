@@ -40,6 +40,40 @@ function Print-Usage {
 . $PSScriptRoot\inc\ueeditor.ps1
 . $PSScriptRoot\inc\filetools.ps1
 
+function Get-Current-Umaps {
+    # Find all umaps which are tracked in git and get their LFS SHAs
+    $umapsOutput = git lfs ls-files -l -I *.umap
+    # Output is of the form
+    # b75b42e082ffb0deeb3fc7b40b2a221ded62872a2289bf6b63e275372849447b * Content/Maps/Subfolder/MyLevel.umap
+    foreach ($line in $umapsOutput) {
+        if ($line -match "^([a-f0-9]+)\s+\*\s+(.+)$") {
+            $oid = $matches[1]
+            $filename = $matches[2].Trim()
+
+            # returns multiple entries here
+            # use property bag for convenience
+            New-Object PSObject -Property @{Filename=$filename;Oid=$oid}
+        }
+    }
+}
+
+function Get-Builtdata-Paths {
+    param (
+        [object]$umap,
+        [string]$syncdir
+    )
+
+    $subdir = [System.IO.Path]::GetDirectoryName($umap.Filename)
+    $basename = [System.IO.Path]::GetFileNameWithoutExtension($umap.Filename)
+
+    $localbuiltdata = Join-Path $subdir "${basename}_BuiltData.uasset"
+    $remotesubdir = Join-Path $syncdir $subdir
+    $remotebuiltdata = Join-Path $remotesubdir "${basename}_BuiltData_$($umap.Oid).uasset"
+
+    return $localbuiltdata, $remotebuiltdata
+
+}
+
 $ErrorActionPreference = "Stop"
 
 
@@ -140,67 +174,109 @@ try {
     New-Item -ItemType Directory $syncdir -Force > $null
     Write-Output "Sync project folder: $syncdir"
 
-    # Find all umaps which are tracked in git and get their LFS SHAs
-    $umapsOutput = git lfs ls-files -l -I *.umap
-    # Output is of the form
-    # b75b42e082ffb0deeb3fc7b40b2a221ded62872a2289bf6b63e275372849447b * Content/Maps/Subfolder/MyLevel.umap
-    foreach ($line in $umapsOutput) {
-        if ($line -match "^([a-f0-9]+)\s+\*\s+(.+)$") {
-            $oid = $matches[1]
-            $filename = $matches[2].Trim()
+    $umaps = Get-Current-Umaps
+    foreach ($umap in $umaps) {
 
-            $subdir = [System.IO.Path]::GetDirectoryName($filename)
-            $basename = [System.IO.Path]::GetFileNameWithoutExtension($filename)
+        $filename = $umap.Filename
+        $oid = $umap.Oid
 
-            $localbuiltdata = Join-Path $subdir "${basename}_BuiltData.uasset"
-            $remotesubdir = Join-Path $syncdir $subdir
-            $remotebuiltdata = Join-Path $remotesubdir "${basename}_BuiltData_${oid}.uasset"
+        Write-Verbose "Checking $filename ($oid)"
 
-            $same = Compare-Files-Quick $localbuiltdata $remotebuiltdata
+        $localbuiltdata, $remotebuiltdata = Get-Builtdata-Paths $umap $syncdir
 
-            if ($same -and -not $force) {
-                Write-Verbose "Skipping $basename, matches"
+        $same = Compare-Files-Quick $localbuiltdata $remotebuiltdata
+
+        if ($same -and -not $force) {
+            Write-Verbose "Skipping $filename, matches"
+            continue
+        }
+
+        if ($mode -eq "push") {
+            Write-Verbose "$localbuiltdata  ->  $remotebuiltdata"
+
+            # In push mode, we only upload our builtdata if there is no existing
+            # entry for that OID by default (safest). Or, if forced to do so
+            if (-not (Test-Path $localbuiltdata -PathType Leaf)) {
+                Write-Warning "Skipping $filename, local file missing"
                 continue
             }
 
-            if ($mode -eq "push") {
-                Write-Verbose "$localbuiltdata  ->  $remotebuiltdata"
-
-                # In push mode, we only upload our builtdata if there is no existing
-                # entry for that OID by default (safest). Or, if forced to do so
-                if (-not (Test-Path $localbuiltdata -PathType Leaf)) {
-                    Write-Warning "Skipping $basename, local file missing"
-                    continue
-                }
-
-                if ($dryrun) {
-                    Write-Output "Would have pushed: $basename ($oid)"
-                } else {
-                    Write-Output "Push: $basename ($oid)"
-                    New-Item -ItemType Directory $remotesubdir -Force > $null
-                    Copy-Item $localbuiltdata $remotebuiltdata    
-                }
-
+            if ($dryrun) {
+                Write-Output "Would have pushed: $filename ($oid)"
             } else {
-                Write-Verbose("$remotebuiltdata  ->  $localbuiltdata")
-                # In pull mode, we always pull if not same, or forced (checked already above)
+                Write-Output "Push: $filename ($oid)"
 
-                if (-not (Test-Path $remotebuiltdata -PathType Leaf)) {
-                    Write-Warning "Skipping $basename, remote file missing"
-                    continue
-                }
-
-                if ($dryrun) {
-                    Write-Output "Would have pulled: $basename ($oid)"
-                } else {
-                    Write-Output "Pull: $basename ($oid)"
-                    New-Item -ItemType Directory $subdir -Force > $null
-                    Copy-Item $remotebuiltdata $localbuiltdata    
-                }
-
+                New-Item -ItemType Directory [System.IO.Path]::GetDirectoryName($remotebuiltdata) -Force > $null
+                Copy-Item $localbuiltdata $remotebuiltdata    
             }
+
+        } else {
+            Write-Verbose("$remotebuiltdata  ->  $localbuiltdata")
+            # In pull mode, we always pull if not same, or forced (checked already above)
+
+            if (-not (Test-Path $remotebuiltdata -PathType Leaf)) {
+                Write-Warning "Skipping $filename, remote file missing"
+                continue
+            }
+
+            if ($dryrun) {
+                Write-Output "Would have pulled: $filename ($oid)"
+            } else {
+                Write-Output "Pull: $filename ($oid)"
+                New-Item -ItemType Directory $subdir -Force > $null
+                Copy-Item $remotebuiltdata $localbuiltdata    
+            }
+
         }
     }
+
+    if ($prune) {
+        # Only keep latest for each map file
+        # We derive that from the current oids, which we always keep, and date
+
+        
+        Write-Output "Pruning..."
+        foreach ($umap in $umaps) {
+            # We want to delete any files for this map which have a different OID
+            # and which are older (to prevent deletion if you're behind)
+
+            # Get our current one
+            $localfile, $remotefile = Get-Builtdata-Paths $umap $syncdir
+
+            $remotedir = [System.IO.Path]::GetDirectoryName($remotefile)
+            $basename = [System.IO.Path]::GetFileNameWithoutExtension($umap.Filename)
+            $matchingremotefiles = Get-ChildItem $remotedir -filter "${basename}_BuiltData_*.uasset" -ErrorAction Continue
+
+            if (-not (Test-Path $remotefile -PathType Leaf)) {
+                Write-Verbose "Skipping pruning old versions for $($umap.Filename) since our version isn't on remote"
+                continue
+            }
+            $ourfileprops = Get-ItemProperty -Path $remotefile
+
+            foreach ($file in $matchingremotefiles) {
+                Write-Verbose "Considering $($file.Name) for deletion"
+                if ($file.Name -notlike "*$($umap.Oid).uasset") {
+                    # This is not our OID, check date
+                    if ($file.LastWriteTime -le $ourfileprops.LastWriteTime) {
+                        if ($dryrun) {
+                            Write-Output "Would have pruned $($file.FullName)"
+                        } else {
+                            Write-Output "Pruning $($file.FullName)"
+                            Remove-Item -Path $file.FullName -Force
+                        }
+                    } else {
+                        Write-Verbose "Not pruning $($file.Name), date/time is later than ours"
+                    }
+                } else {
+                    Write-Verbose "Not pruning $($file.Name), this is our latest"
+                }
+            }
+
+        }
+
+    }
+    
+
     
 
     Write-Output "-- Sync process finished OK --"
