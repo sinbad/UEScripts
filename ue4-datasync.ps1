@@ -140,19 +140,16 @@ if (-not $umapsOK) {
     Exit 5
 }
 
-# Check no changes, ONLY to .umap files
-$statusOutput = git status --porcelain *.umap
+# Check for changes, ONLY to .umap files
+$statusOutput = git status -uno --porcelain *.umap
+$modifiedMaps = [System.Collections.ArrayList]@()
+
 foreach ($line in $statusOutput) {
-    if ($line -like "*.umap*") {
-        Write-Output "Uncommitted changes to .umap file(s) detected"
-        if ($dryrun) {
-            Write-Output "dryrun: Continuing but this will fail without -dryrun"
-            break
-        } else {
-            Write-Output "Cannot continue"
-            Exit $LASTEXITCODE
-        }
-    
+    if ($line -match "^(?: [^\s]|[^\s] |[^\s][^\s])\s+(.+)$") {
+        $filename = $matches[1]
+        $modifiedMaps.Add($filename) > $null
+
+        Write-Warning "Uncommitted change: $filename (will be skipped)"    
     }
 }
 
@@ -198,6 +195,11 @@ try {
         $oid = $umap.Oid
 
         Write-Verbose "Checking $filename ($oid)"
+
+        if ($modifiedMaps.Contains($filename)) {
+            Write-Verbose "Skipping $filename, uncommitted changes"
+            continue            
+        }
 
         $localbuiltdata, $remotebuiltdata = Get-Builtdata-Paths $umap $syncdir
 
