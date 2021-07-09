@@ -23,7 +23,7 @@ function Print-Usage {
     Write-Output "               : (should be root of project)"
     Write-Output "  -prune       : Clean up versions of the data older than the latest"
     Write-Output "  -force       : Copy ALL BuiltData files regardless of size/timestamp checks"
-    Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent download of updated files)"
+    Write-Output "  -nocloseeditor : Don't close UE4 editor before pulling (may prevent success)"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
     Write-Output " "
@@ -177,10 +177,14 @@ try {
         Write-Output "Syncing $uprojname"
     }
 
-    # Close UE4 as early as possible
-    if (-not $nocloseeditor) {
+    # Close UE4 as early as possible in pull mode
+    if ($mode -eq "pull" -and -not $nocloseeditor) {
         # Check if UE4 is running, if so try to shut it gracefully
-        Close-UE-Editor $uprojname $dryrun
+        if ($dryrun) {
+            Write-Output "Would have closed UE Editor"            
+        } else {
+            Close-UE-Editor $uprojname $dryrun
+        }
     }
 
     # Create project sync dir if necessary
