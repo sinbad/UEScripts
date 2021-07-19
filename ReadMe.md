@@ -25,6 +25,3 @@ automation tools assume P4, which can be inconvenient).
 * Itch's [`butler` tool](https://itch.io/docs/butler/) if you wish to release to Itch.io
 * The [Steamworks SDK](https://partner.steamgames.com/doc/sdk) if you wish to release on Steam
 
-
-If these tools are useful, please consider :heart: **[Supporting my work on Patreon!](https://www.patreon.com/stevestreeting)**
-
