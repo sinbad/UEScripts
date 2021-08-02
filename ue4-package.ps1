@@ -205,7 +205,7 @@ try {
         if ($forcetag) {
             $forcearg = "-f"
         }
-        if (-not $test -and -not $dryrun) {
+        if (-not $test -and -not $dryrun -and $isGit) {
             if ($src -ne ".") { Push-Location $src }
             git tag $forcearg -a $versionNumber -m "Automated release tag"
             if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
