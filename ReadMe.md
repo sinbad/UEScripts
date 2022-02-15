@@ -7,7 +7,7 @@ They're written on the basis of using Git / Git LFS rather than Perforce (many o
 automation tools assume P4, which can be inconvenient).
 
 * [Setting up a project for Git / Git-LFS](./doc/GitSetup.md): including LFS locking
-* [Managing Git LFS Locking Tasks](./GitScripts/Readme.md): push and unlock, release locks you don't need any more
+* [Managing Git LFS Locking Tasks](https://github.com/sinbad/GitScripts): push and unlock, release locks you don't need any more
 * [Packaging a Game](./doc/Package.md): building, cooking, archiving
 * [Releasing a Game](./doc/Release.md): e.g. uploading to Itch, Steam
 * [Rebuilding Lightmaps](./doc/RebuildLightmaps.md): build lighting on the command line easily (supporting git-lfs locking, no P4 dependency like RunUAT)
