@@ -213,7 +213,7 @@ try {
         }
     }
 
-    $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
+    $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UnrealEditor-Cmd$exeSuffix"
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
 
@@ -233,7 +233,7 @@ try {
         $argList.Add("-archive") > $null
         $argList.Add("-archivedirectory=`"$($outDir)`"") > $null
         $argList.Add("-package") > $null
-        $argList.Add("-ue4exe=`"$ueEditorCmd`"") > $null
+        $argList.Add("-unrealexe=`"$ueEditorCmd`"") > $null
         if ($config.UsePak) {
             $argList.Add("-pak") > $null
         }
