@@ -22,7 +22,7 @@ function Close-UE-Editor {
     Remove-Variable ue4proc
 
     # Also close UE5
-    $ue5proc = Get-Process UEEditor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojectname*" }
+    $ue5proc = Get-Process UnrealEditor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojectname*" }
     if ($ue5proc) {
         if ($dryrun) {
             Write-Output "UE5 project is currently open in editor, would have closed"
