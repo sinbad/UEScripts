@@ -56,7 +56,7 @@ Usage:
 
   -mode        : Whether to push or pull the built data from your filesystem
   -root        : Root folder to sync files to/from. Project name will be appended to this path.
-               : Can be blank if specified in UE4SYNCROOT
+               : Can be blank if specified in UESYNCROOT
   -src         : Source folder (current folder if omitted)
                : (should be root of project)
   -prune       : Clean up versions of the data older than the latest
@@ -67,15 +67,15 @@ Usage:
   -help        : Print this help
 
 Environment Variables:
-  UE4SYNCROOT  : Root path to sync data. Subfolders for each project name.
-  UE4INSTALL   : Use a specific UE4 install.
-               : Default is to find one based on project version, under UE4ROOT
-  UE4ROOT      : Parent folder of all binary UE4 installs (detects version).
-               : Default C:\Program Files\Epic Games
+  UESYNCROOT  : Root path to sync data. Subfolders for each project name.
+  UEINSTALL   : Use a specific Unreal install.
+              : Default is to find one based on project version, under UEROOT
+  UEROOT      : Parent folder of all binary Unreal installs (detects version).
+              : Default C:\Program Files\Epic Games
 ```
 
 You must tell the sync tool where the shared drive is, either using the `-root`
-argument, or defining the `UE4SYNCROOT` environment variable. A project folder
+argument, or defining the `UESYNCROOT` environment variable. A project folder
 will be added below that, based on the name of your .uproject file, so that
 you can use the same root folder for multiple projects.
 
@@ -87,7 +87,7 @@ what happens in each mode.
 
 > Example: `ue4-datasync.ps1 push`
 >
-> Assuming you run this in your project root and have defined the environment variable UE4SYNCROOT
+> Assuming you run this in your project root and have defined the environment variable UESYNCROOT
 
 In push mode, you want to upload BuiltData files you've updated, probably because of a 
 change to the .umap. You have to have committed your changes to the .umap first, 
@@ -109,7 +109,7 @@ umap on this shared drive, without it being in the git repo.
 
 > Example: `ue4-datasync.ps1 pull`
 >
-> Assuming you run this in your project root and have defined the environment variable UE4SYNCROOT
+> Assuming you run this in your project root and have defined the environment variable UESYNCROOT
 
 In pull mode, the script tries to find the BuiltData files corresponding to your
 umap files on the shared drive. Again, you can't have any uncommitted changes to

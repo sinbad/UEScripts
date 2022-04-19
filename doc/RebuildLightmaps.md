@@ -24,8 +24,8 @@ explicitly list them as arguments:
   -help         : Print this help
 
 Environment Variables:
-  UE4INSTALL   : Use a specific UE4 install.
-               : Default is to find one based on project version, under UE4ROOT
-  UE4ROOT      : Parent folder of all binary UE4 installs (detects version).
-               : Default C:\Program Files\Epic Games
+  UEINSTALL   : Use a specific Unreal install.
+              : Default is to find one based on project version, under UEROOT
+  UEROOT      : Parent folder of all binary Unreal installs (detects version).
+              : Default C:\Program Files\Epic Games
 ```

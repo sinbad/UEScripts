@@ -16,14 +16,13 @@ param (
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
-. $PSScriptRoot\inc\ueinstall.ps1
 . $PSScriptRoot\inc\filetools.ps1
 
 # Include Git tools locking
 . $PSScriptRoot\GitScripts\inc\locking.ps1
 
 function Write-Usage {
-    Write-Output "Steve's UE4 lightmap rebuilding tool"
+    Write-Output "Steve's Unreal lightmap rebuilding tool"
     Write-Output "Usage:"
     Write-Output "  ue4-rebuild-lightmaps.ps1 [-src:sourcefolder] [-quality:(preview|medium|high|production)]  [-maps Map1,Map2,Map3] [-dryrun]"
     Write-Output " "
@@ -36,10 +35,10 @@ function Write-Usage {
     Write-Output "  -help         : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
-    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
-    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
-    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
-    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output "  UEINSTALL   : Use a specific Unreal install."
+    Write-Output "              : Default is to find one based on project version, under UEROOT"
+    Write-Output "  UEROOT      : Parent folder of all binary Unreal installs (detects version). "
+    Write-Output "              : Default C:\Program Files\Epic Games"
     Write-Output " "
 }
 
@@ -60,7 +59,7 @@ if ($src -ne ".") { Push-Location $src }
 $isGit = Test-Path ".git"
 if ($src -ne ".") { Pop-Location }
 
-Write-Output "~-~-~ UE4 Lightmap Rebuild Start ~-~-~"
+Write-Output "~-~-~ Unreal Lightmap Rebuild Start ~-~-~"
 
 try {
     $config = Read-Package-Config -srcfolder:$src
@@ -126,7 +125,7 @@ try {
     $argList.Add("-Quality=$quality") > $null
     $argList.Add("-Map=$($foundmaps.BaseNames -join "+")") > $null   
 
-    $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
+    $ueEditorCmd = Get-UEEditorCmd $ueVersion $ueinstall
 
     if ($dryrun) {
         Write-Output "Would have run:"
@@ -143,11 +142,11 @@ try {
 
 } catch {
     Write-Output $_.Exception.Message
-    Write-Output "~-~-~ UE4 Lightmap Rebuild FAILED ~-~-~"
+    Write-Output "~-~-~ Unreal Lightmap Rebuild FAILED ~-~-~"
     Exit 9
 
 }
 
 
-Write-Output "~-~-~ UE4 Lightmap Rebuild OK ~-~-~"
+Write-Output "~-~-~ Unreal Lightmap Rebuild OK ~-~-~"
 Write-Output "Reminder: You may need to commit and unlock map files"

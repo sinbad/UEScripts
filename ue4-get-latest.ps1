@@ -7,22 +7,22 @@ param (
 )
 
 function Print-Usage {
-    Write-Output "Steve's UE4 Get Latest Tool"
-    Write-Output "   Get latest from repo and build for dev. Will close UE4 editor!"
+    Write-Output "Steve's Unreal Get Latest Tool"
+    Write-Output "   Get latest from repo and build for dev. Will close Unreal editor!"
     Write-Output "Usage:"
     Write-Output "  ue4-get-latest.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
-    Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent DLL cleanup)"
+    Write-Output "  -nocloseeditor : Don't close Unreal editor (this will prevent DLL cleanup)"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
-    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
-    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
-    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
-    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output "  UEINSTALL   : Use a specific Unreal install."
+    Write-Output "              : Default is to find one based on project version, under UEROOT"
+    Write-Output "  UEROOT      : Parent folder of all binary Unreal installs (detects version). "
+    Write-Output "              : Default C:\Program Files\Epic Games"
     Write-Output " "
 
 }
@@ -129,7 +129,7 @@ try {
     }
 
     # Automatically pull lighting builds, if environment variable defined
-    if ($Env:UE4SYNCROOT) {
+    if ($Env:UESYNCROOT -or $Env:UE4SYNCROOT) {
         $cmdargs = @()
         if ($nocloseeditor) {
             $cmdargs += "-nocloseeditor"

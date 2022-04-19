@@ -47,8 +47,8 @@ class PackageVariant {
 
 # Our config for both building and releasing
 # Note that environment variables also have an effect:
-# - UE4INSTALL: a specific UE install to use (default blank, find a version in UE4ROOT)
-# - UE4ROOT: Parent folder of all binary UE4 installs (default C:\Program Files\Epic Games)
+# - UEINSTALL: a specific UE install to use (default blank, find a version in UEROOT)
+# - UEROOT: Parent folder of all binary UE installs (default C:\Program Files\Epic Games)
 class PackageConfig {
     # The root of the folder structure which will contain packaged output
     # Will be structured $OutputDir/$version/$variant

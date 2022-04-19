@@ -28,13 +28,12 @@ param (
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
 . $PSScriptRoot\inc\uproject.ps1
-. $PSScriptRoot\inc\ueinstall.ps1
 . $PSScriptRoot\inc\ueeditor.ps1
 . $PSScriptRoot\inc\filetools.ps1
 
 
 function Write-Usage {
-    Write-Output "Steve's UE4 packaging tool"
+    Write-Output "Steve's Unreal packaging tool"
     Write-Output "Usage:"
     Write-Output "  ue4-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
     Write-Output " "
@@ -53,9 +52,9 @@ function Write-Usage {
     Write-Output "  -help         : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
-    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
-    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
-    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
+    Write-Output "  UEINSTALL   : Use a specific Unreal install."
+    Write-Output "               : Default is to find one based on project version, under UEROOT"
+    Write-Output "  UEROOT      : Parent folder of all binary Unreal installs (detects version). "
     Write-Output "               : Default C:\Program Files\Epic Games"
     Write-Output " "
 }
@@ -72,7 +71,7 @@ if ($help) {
     Exit 0
 }
 
-Write-Output "~-~-~ UE4 Packaging Helper Start ~-~-~"
+Write-Output "~-~-~ Unreal Packaging Helper Start ~-~-~"
 
 if ($test) {
     Write-Output "TEST MODE: No tagging, version bumping"
@@ -213,7 +212,8 @@ try {
         }
     }
 
-    $ueEditorCmd = Join-Path $ueinstall "Engine/Binaries/Win64/UE4Editor-Cmd$exeSuffix"
+    
+    $ueEditorCmd = Get-UEEditorCmd $ueVersion $ueinstall
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
 
@@ -233,7 +233,11 @@ try {
         $argList.Add("-archive") > $null
         $argList.Add("-archivedirectory=`"$($outDir)`"") > $null
         $argList.Add("-package") > $null
-        $argList.Add("-ue4exe=`"$ueEditorCmd`"") > $null
+        if ((Get-Is-UE5 $ueVersion)) {
+            $argList.Add("-unrealexe=`"$ueEditorCmd`"") > $null
+        } else {
+            $argList.Add("-ue4exe=`"$ueEditorCmd`"") > $null
+        }
         if ($config.UsePak) {
             $argList.Add("-pak") > $null
         }
@@ -303,8 +307,8 @@ try {
 }
 catch {
     Write-Output $_.Exception.Message
-    Write-Output "~-~-~ UE4 Packaging Helper FAILED ~-~-~"
+    Write-Output "~-~-~ Unreal Packaging Helper FAILED ~-~-~"
     Exit 9
 }
 
-Write-Output "~-~-~ UE4 Packaging Helper Completed OK ~-~-~"
+Write-Output "~-~-~ Unreal Packaging Helper Completed OK ~-~-~"
