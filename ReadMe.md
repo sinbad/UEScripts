@@ -1,9 +1,9 @@
-# Steve's UE4 Scripts
+# Steve's Unreal Scripts
 
 ## Summary
 
-These scripts are to help with various tasks in [Unreal Engine 4](https://www.unrealengine.com). 
-They're written on the basis of using Git / Git LFS rather than Perforce (many of UE4's own
+These scripts are to help with various tasks in [Unreal Engine](https://www.unrealengine.com). 
+They're written on the basis of using Git / Git LFS rather than Perforce (many of Unreal's own
 automation tools assume P4, which can be inconvenient).
 
 * [Setting up a project for Git / Git-LFS](./doc/GitSetup.md): including LFS locking

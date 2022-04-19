@@ -11,14 +11,14 @@ param (
 )
 
 function Print-Usage {
-    Write-Output "Steve's UE4 Map BuiltData Sync Tool"
+    Write-Output "Steve's UE Map BuiltData Sync Tool"
     Write-Output "  Avoid storing Map_BuiltData.uasset files in source control, sync them directly instead"
     Write-Output "Usage:"
     Write-Output "  ue4-datasync.ps1 [-mode:]<push|pull> [[-path:]syncpath] [Options]"
     Write-Output " "
     Write-Output "  -mode        : Whether to push or pull the built data from your filesystem"
     Write-Output "  -root        : Root folder to sync files to/from. Project name will be appended to this path."
-    Write-Output "               : Can be blank if specified in UE4SYNCROOT"
+    Write-Output "               : Can be blank if specified in UESYNCROOT"
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
     Write-Output "  -prune       : Clean up versions of the data older than the latest"
@@ -28,11 +28,11 @@ function Print-Usage {
     Write-Output "  -help        : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
-    Write-Output "  UE4SYNCROOT  : Root path to sync data. Subfolders for each project name."
-    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
-    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
-    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
-    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output "  UESYNCROOT  : Root path to sync data. Subfolders for each project name."
+    Write-Output "  UEINSTALL   : Use a specific Unreal install."
+    Write-Output "              : Default is to find one based on project version, under UEROOT"
+    Write-Output "  UEROOT      : Parent folder of all binary Unreal installs (detects version). "
+    Write-Output "              : Default C:\Program Files\Epic Games"
     Write-Output " "
 
 }
@@ -107,12 +107,16 @@ if ($mode -ne "push" -and $mode -ne "pull") {
 }
 
 if (-not $root) {
+    $root = $Env:UESYNCROOT
+}
+# Backwards compat
+if (-not $root) {
     $root = $Env:UE4SYNCROOT
 }
 
 if (-not $root) {
     Print-Usage
-    Write-Output "ERROR: Missing '-root' argument and no UE4SYNCROOT env var"
+    Write-Output "ERROR: Missing '-root' argument and no UESYNCROOT env var"
     Exit 3
 }
 
@@ -160,7 +164,7 @@ try {
 
     Write-Output "-- Sync process starting --"
 
-    # Locate UE4 project file
+    # Locate UE project file
     $uprojfile = Get-ChildItem *.uproject | Select-Object -expand Name
     if (-not $uprojfile) {
         throw "No Unreal project file found in $(Get-Location)! Aborting."
@@ -177,9 +181,9 @@ try {
         Write-Output "Syncing $uprojname"
     }
 
-    # Close UE4 as early as possible in pull mode
+    # Close UE as early as possible in pull mode
     if ($mode -eq "pull" -and -not $nocloseeditor) {
-        # Check if UE4 is running, if so try to shut it gracefully
+        # Check if UE is running, if so try to shut it gracefully
         if ($dryrun) {
             Write-Output "Would have closed UE Editor"            
         } else {

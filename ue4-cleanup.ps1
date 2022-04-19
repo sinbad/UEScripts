@@ -7,14 +7,14 @@ param (
 )
 
 function Print-Usage {
-    Write-Output "Steve's UE4 Project Cleanup Tool"
-    Write-Output "   Clean up hot-reload DLLs & prune LFS to free space. Will close UE4 editor!"
+    Write-Output "Steve's Unreal Project Cleanup Tool"
+    Write-Output "   Clean up hot-reload DLLs & prune LFS to free space. Will close Unreal editor!"
     Write-Output "Usage:"
     Write-Output "  ue4-cleanup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
-    Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent DLL cleanup)"
+    Write-Output "  -nocloseeditor : Don't close Unreal editor (this will prevent DLL cleanup)"
     Write-Output "  -lfsprune    : Call 'git lfs prune' to delete old LFS files as well"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
@@ -27,12 +27,18 @@ function Cleanup-DLLs($cleanupdir, $projname, $dryrun) {
     } else {
         Write-Output "Cleaning up temporary DLLs/PDBs in $cleanupdir for $projname"
     }
-    # Hot Reload files
+    # Hot Reload files - UE4
     $cleanupfiles = @(Get-ChildItem "$cleanupdir\UE4Editor-$projname-????.dll" | Select-Object -Expand Name)
     $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname-????.pdb" | Select-Object -Expand Name)
-    # Live Coding files
+    # Live Coding files - UE4
     $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname.exe.patch_*" | Select-Object -Expand Name)
     $cleanupfiles += @(Get-ChildItem "$cleanupdir\UE4Editor-$projname.pdb.patch_*" | Select-Object -Expand Name)
+    # Hot Reload files - UE5
+    $cleanupfiles = @(Get-ChildItem "$cleanupdir\UnrealEditor-$projname-????.dll" | Select-Object -Expand Name)
+    $cleanupfiles += @(Get-ChildItem "$cleanupdir\UnrealEditor-$projname-????.pdb" | Select-Object -Expand Name)
+    # Live Coding files - UE5
+    $cleanupfiles += @(Get-ChildItem "$cleanupdir\UnrealEditor-$projname.exe.patch_*" | Select-Object -Expand Name)
+    $cleanupfiles += @(Get-ChildItem "$cleanupdir\UnrealEditor-$projname.pdb.patch_*" | Select-Object -Expand Name)
     foreach ($cf in $cleanupfiles) {
         if ($dryrun) {
             Write-Output "Would have deleted $cleanupdir\$cf"
@@ -59,7 +65,7 @@ $result = 0
 try {
     if ($src -ne ".") { Push-Location $src }
 
-    # Locate UE4 project file
+    # Locate UE project file
     $uprojfile = Get-ChildItem *.uproject | Select-Object -expand Name
     if (-not $uprojfile) {
         throw "No Unreal project file found in $(Get-Location)! Aborting."
@@ -76,9 +82,9 @@ try {
         Write-Output "Cleaning up $uprojname"
     }
 
-    # Close UE4 as early as possible
+    # Close UE as early as possible
     if (-not $nocloseeditor) {
-        # Check if UE4 is running, if so try to shut it gracefully
+        # Check if UE is running, if so try to shut it gracefully
         Close-UE-Editor $uprojname $dryrun
 
         # Find all the modules in the project

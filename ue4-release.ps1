@@ -24,7 +24,7 @@ param (
 
 
 function Write-Usage {
-    Write-Output "Steve's UE4 release tool"
+    Write-Output "Steve's Unreal release tool"
     Write-Output "Usage:"
     Write-Output "  ue4-release.ps1 [-version:ver|-latest] -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
     Write-Output " "
@@ -64,7 +64,7 @@ if ($version -and $latest) {
     Exit 1
 }
 
-Write-Output "~-~-~ UE4 Release Helper Start ~-~-~"
+Write-Output "~-~-~ Unreal Release Helper Start ~-~-~"
 
 try {
 
@@ -141,9 +141,9 @@ try {
 
 } catch {
     Write-Output $_.Exception.Message
-    Write-Output "~-~-~ UE4 Release Helper FAILED ~-~-~"
+    Write-Output "~-~-~ Unreal Release Helper FAILED ~-~-~"
     Exit 9
 }
 
 
-Write-Output "~-~-~ UE4 Release Helper Completed OK ~-~-~"
+Write-Output "~-~-~ Unreal Release Helper Completed OK ~-~-~"

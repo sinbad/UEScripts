@@ -8,7 +8,7 @@ param (
 )
 
 function Print-Usage {
-    Write-Output "Steve's UE4 Build Tool"
+    Write-Output "Steve's Unreal Build Tool"
     Write-Output "   This is a WIP, only builds for dev right now"
     Write-Output "Usage:"
     Write-Output "  ue4-build.ps1 [[-mode:]<dev|test|prod>] [[-src:]sourcefolder] [Options]"
@@ -20,15 +20,15 @@ function Print-Usage {
     Write-Output "               : prod = build Shipping and package for production (TODO)"
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
-    Write-Output "  -nocloseeditor : Don't close UE4 editor (this will prevent DLL cleanup)"
+    Write-Output "  -nocloseeditor : Don't close Unreal editor (this will prevent DLL cleanup)"
     Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help        : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
-    Write-Output "  UE4INSTALL   : Use a specific UE4 install."
-    Write-Output "               : Default is to find one based on project version, under UE4ROOT"
-    Write-Output "  UE4ROOT      : Parent folder of all binary UE4 installs (detects version). "
-    Write-Output "               : Default C:\Program Files\Epic Games"
+    Write-Output "  UEINSTALL   : Use a specific Unreal install."
+    Write-Output "              : Default is to find one based on project version, under UEROOT"
+    Write-Output "  UEROOT      : Parent folder of all binary Unreal installs (detects version). "
+    Write-Output "              : Default C:\Program Files\Epic Games"
     Write-Output " "
 
 }
@@ -60,7 +60,7 @@ try {
 
     Write-Output "-- Build process starting --"
 
-    # Locate UE4 project file
+    # Locate Unreal project file
     $uprojfile = Get-ChildItem *.uproject | Select-Object -expand Name
     if (-not $uprojfile) {
         throw "No Unreal project file found in $(Get-Location)! Aborting."
@@ -77,21 +77,30 @@ try {
         Write-Output "Building $uprojname for $mode"
     }
 
-    # Check version number of UE4 project so we know which version to run
+    # Check version number of Unreal project so we know which version to run
     # We can read this from .uproject which is JSON
     $uproject = Get-Content $uprojfile | ConvertFrom-Json
     $uversion = $uproject.EngineAssociation
 
     Write-Output "Engine version is $uversion"
 
-    # UE4INSTALL env var should point at the root of the *specific version* of 
-    # UE4 you want to use. This is mainly for use in source builds, default is
-    # to build it from version number and root of all UE4 binary installs
-    $uinstall = $Env:UE4INSTALL
+    # UEINSTALL env var should point at the root of the *specific version* of 
+    # Unreal you want to use. This is mainly for use in source builds, default is
+    # to build it from version number and root of all UE binary installs
+    $uinstall = $Env:UEINSTALL
+
+    # Backwards compat with old env var
+    if (-not $uinstall) {
+        $uinstall = $Env:UE4INSTALL
+    }
 
     if (-not $uinstall) {
-        # UE4ROOT should be the parent folder of all UE versions
-        $uroot = $Env:UE4ROOT
+        # UEROOT should be the parent folder of all UE versions
+        $uroot = $Env:UEROOT
+        # Backwards compat with old env var
+        if (-not $uroot) {
+            $uroot = $Env:UE4ROOT
+        }
         if (-not $uroot) {
             $uroot = "C:\Program Files\Epic Games"
         } 

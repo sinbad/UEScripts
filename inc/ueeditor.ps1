@@ -18,9 +18,24 @@ function Close-UE-Editor {
                 throw "Couldn't close UE4 gracefully, aborting!"
             }
         }
-    } else {
-        Write-Verbose "UE4 project is not open in editor"
     }
     Remove-Variable ue4proc
+
+    # Also close UE5
+    $ue5proc = Get-Process UEEditor -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle -like "$uprojectname*" }
+    if ($ue5proc) {
+        if ($dryrun) {
+            Write-Output "UE5 project is currently open in editor, would have closed"
+        } else {
+            Write-Output "UE5 project is currently open in editor, closing..."
+            $ue5proc.CloseMainWindow() > $null 
+            Start-Sleep 5
+            if (!$ue5proc.HasExited) {
+                throw "Couldn't close UE5 gracefully, aborting!"
+            }
+        }
+    }
+    Remove-Variable ue5proc
+
 
 }

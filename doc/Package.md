@@ -5,7 +5,7 @@ much like using "File > Package Project" in the UE editor. However, it offers a
 number of other features.
 
 This script operates based on a `packageconfig.json` file which must be present
-in the root of your UE4 project. Please see the [Package Config File docs](PackageConfig.md)
+in the root of your Unreal project. Please see the [Package Config File docs](PackageConfig.md)
 for a full description of this file.
 
 ```
@@ -26,10 +26,10 @@ for a full description of this file.
   -help         : Print this help
 
 Environment Variables:
-  UE4INSTALL   : Use a specific UE4 install.
-               : Default is to find one based on project version, under UE4ROOT
-  UE4ROOT      : Parent folder of all binary UE4 installs (detects version).
-               : Default C:\Program Files\Epic Games
+  UEINSTALL   : Use a specific Unreal install.
+              : Default is to find one based on project version, under UEROOT
+  UEROOT      : Parent folder of all binary Unreal installs (detects version).
+              : Default C:\Program Files\Epic Games
 ```
 
 ## What the Script Does
@@ -42,10 +42,10 @@ are always from a known version.
 
 ### 2. Locate UE Install
 
-The script can locate your UE4 install automatically. You may need to customise
+The script can locate your Unreal install automatically. You may need to customise
 this on non-Windows platforms or if you use a source build. 
 
-See [How Scripts Locate the UE4 Install](UEInstall.md) for more details.
+See [How Scripts Locate the Unreal Install](UEInstall.md) for more details.
 
 ### 3. Close the UE Editor
 

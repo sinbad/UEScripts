@@ -30,7 +30,7 @@ function Release-Steam {
     # Preview mode in Steam build just outputs logs so it's dryrun
     $preview = if($dryrun) { "1" } else { "0"}
 
-    # Use the UE4 platform as Steam target
+    # Use the UE platform as Steam target
     $target = $variant.Platform
 
     # write app file up to depot section then fill that in as we do depots

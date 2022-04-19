@@ -13,7 +13,7 @@ you might want to keep an eye on that.
 We use a this content workflow in our UE game repositories:
 
 1. All content creation files in `$REPO/MediaSrc` (subfolders by type)
-    * These are typically in formats e.g. Blender that UE4 doesn't read directly, so outside `Content`
+    * These are typically in formats e.g. Blender that Unreal doesn't read directly, so outside `Content`
     * These files are added to Git
     * They are also tracked as Git LFS files
     * They are NOT marked as lockable, simply because the tooling for managing locking
