@@ -22,7 +22,7 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal Blueprint recompile tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-blueprint-recompile.ps1 [-src:sourcefolder] [-bpdir:blueprintdir] [-dryrun]"
+    Write-Output "  ue-blueprint-recompile.ps1 [-src:sourcefolder] [-bpdir:blueprintdir] [-dryrun]"
     Write-Output " "
     Write-Output "  -src          : Source folder (current folder if omitted)"
     Write-Output "  -bpdir        : Path to Blueprints relative to your Content dir, defaults to 'Blueprints'"

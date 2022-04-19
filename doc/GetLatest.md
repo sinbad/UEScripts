@@ -4,7 +4,7 @@ We've found it useful to provide a simple script which can be run on artists'
 machines to get the latest from Git, and make sure all the C++ components are
 built. 
 
-It now also automatically calls `ue4-datasync.ps1 pull` if `UESYNCROOT` is defined
+It now also automatically calls `ue-datasync.ps1 pull` if `UESYNCROOT` is defined
 in the environment.
 
 While the UE editor can sometimes do this successfully on startup as well,
@@ -16,7 +16,7 @@ The script also automatically closes the UE editor if it's open on the same
 project to make sure the build is successful.
 
 ```
-  ue4-get-latest.ps1 [[-src:]sourcefolder] [Options]
+  ue-get-latest.ps1 [[-src:]sourcefolder] [Options]
 
   -src         : Source folder (current folder if omitted)
                : (should be root of project)

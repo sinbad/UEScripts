@@ -1,6 +1,6 @@
 # Packaging Script
 
-The `ue4-package.ps1` script builds, cooks and packages your game into a folder, 
+The `ue-package.ps1` script builds, cooks and packages your game into a folder, 
 much like using "File > Package Project" in the UE editor. However, it offers a 
 number of other features.
 
@@ -9,7 +9,7 @@ in the root of your Unreal project. Please see the [Package Config File docs](Pa
 for a full description of this file.
 
 ```
-  ue4-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]
+  ue-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]
 
   -src          : Source folder (current folder if omitted), must contain packageconfig.json
   -major        : Increment major version i.e. [x++].0.0.0
@@ -78,7 +78,7 @@ only a specific list, or all *excluding* a chosen few.
 
 ### 7. Package Variants
 
-Rather than building / packaging just a single way, `ue4-package.ps1` supports
+Rather than building / packaging just a single way, `ue-package.ps1` supports
 packaging multiple variants of your project. The variations can be:
 
 * **Platform**: lets you build for Windows, Linux, Mac etc

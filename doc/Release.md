@@ -1,6 +1,6 @@
 # Release Script
 
-The release script `ue4-release.ps1` takes previously packaged builds (see
+The release script `ue-release.ps1` takes previously packaged builds (see
 [Packaging Script](./Package.md)) and uploads them to publishing services; 
 currently Itch.io and Steam.
 
@@ -11,7 +11,7 @@ release on Itch.
 This script uses configuration stored in [`packageconfig.json`](./PackageConfig.md).
 
 ```
-  ue4-release.ps1 [-version:ver|-latest] -variants:v1,v2 -services:steam,itch [-src:sourcefolder] [-dryrun]
+  ue-release.ps1 [-version:ver|-latest] -variants:v1,v2 -services:steam,itch [-src:sourcefolder] [-dryrun]
 
   -version:ver        : Version to release; must have been packaged already
   -latest             : Instead of an explicit version, release one identified in project settings  

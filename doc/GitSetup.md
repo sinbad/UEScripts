@@ -20,7 +20,7 @@ We use a this content workflow in our UE game repositories:
       isn't very good outside of Unreal right now
 1. When exporting, output (`FBX`, `PNG`, `WAV` etc) goes in `$REPO/Content` (and subfolders)
     * These files are *ignored* in Git because they are derived data
-    * UE4 imports them to a `.uasset` which contains all their contents anyway
+    * Unreal imports them to a `.uasset` which contains all their contents anyway
 1. Imported content becomes `.uasset` in `$REPO/Content`
     * These files are added to Git
     * They are also tracked as Git LFS files
@@ -30,13 +30,13 @@ Together the script below configures all of this automatically.
 
 ## The script
 
-You run the script from a Powershell prompt, in the root of your UE4 project.
+You run the script from a Powershell prompt, in the root of your Unreal project.
 
 ```
-ue4-git-setup.ps1 [[-src:]sourcefolder] [Options]
+ue-git-setup.ps1 [[-src:]sourcefolder] [Options]
 
 -src         : Source folder (current folder if omitted)
-             : (should be root of your UE4 project)
+             : (should be root of your Unreal project)
 -dryrun      : Don't perform any actual actions, just report on what you would do
 -help        : Print this help
 ```
@@ -51,7 +51,7 @@ See the notes below for some practical details of running it.
    * `git lfs migrate import --everything --include="*.uasset,*.umap,<others>"`
    * This repo will need to be re-cloned by everyone but it's MUCH cleaner than changing to LFS mid-history
 1. Make a note of any custom .gitignore entries you have, the script will replace it
-1. Run `ue4-git-setup.ps1` in the root project folder
+1. Run `ue-git-setup.ps1` in the root project folder
 1. Add back any specialised .gitignores we didn't cover (might not need any)
 1. Push ALL BRANCHES of this new repo to the host of your choice
 

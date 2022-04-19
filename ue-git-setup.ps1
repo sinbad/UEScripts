@@ -9,11 +9,11 @@ param (
 )
 
 function Print-Usage {
-    Write-Output "Steve's UE4 Git Repo Setup Tool"
-    Write-Output "  Run this on your just-created UE4 project folder."
+    Write-Output "Steve's Unreal Git Repo Setup Tool"
+    Write-Output "  Run this on your just-created Unreal project folder."
     Write-Output "  .gitattributes and .gitignore will be overwritten"
     Write-Output "Usage:"
-    Write-Output "  ue4-git-setup.ps1 [[-src:]sourcefolder] [Options]"
+    Write-Output "  ue-git-setup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of trunk in new repo)"
@@ -148,7 +148,7 @@ if ($help) {
 
 if (-not (Get-Module -ListAvailable -Name PsIni)) {
     Write-Output "Missing module: PsIni"
-    Write-Output "This script uses PsIni to update the UE4 DefaultEngine.ini"
+    Write-Output "This script uses PsIni to update DefaultEngine.ini"
     Write-Output "Install it using 'Install-Module PsIni [-Scope CurrentUser]'"
     Exit 2
 }

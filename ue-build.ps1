@@ -11,7 +11,7 @@ function Print-Usage {
     Write-Output "Steve's Unreal Build Tool"
     Write-Output "   This is a WIP, only builds for dev right now"
     Write-Output "Usage:"
-    Write-Output "  ue4-build.ps1 [[-mode:]<dev|test|prod>] [[-src:]sourcefolder] [Options]"
+    Write-Output "  ue-build.ps1 [[-mode:]<dev|test|prod>] [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -mode        : Build mode"
     Write-Output "               : dev = build Development Editor, dlls only (default)"

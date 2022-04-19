@@ -35,7 +35,7 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal packaging tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
+    Write-Output "  ue-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
     Write-Output " "
     Write-Output "  -src          : Source folder (current folder if omitted), must contain packageconfig.json"
     Write-Output "  -major        : Increment major version i.e. [x++].0.0.0"

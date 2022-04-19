@@ -37,7 +37,7 @@ specific to your LFS server. It's not ideal.
 My solution is to write a tool to make it easier to share BuiltData files 
 as a side-channel to the Git LFS repository. You simply provide a file share
 (ideally a network drive, or a synced folder like Google Drive / Dropbox if you
-don't mind a little duplication) and use my script `ue4-datasync.ps1` to 
+don't mind a little duplication) and use my script `ue-datasync.ps1` to 
 sync lighting data between team members. 
 
 Using Git LFS is a prerequisite, because it uses the OIDs from the .umap files
@@ -46,13 +46,13 @@ the matching version of the BuiltData is used.
 
 ## Details
 
-Note: this script will automatically close the UE4 editor if you have the
+Note: this script will automatically close the Unreal editor if you have the
 project open, in order to prevent accidental issues such as unsaved changes or
 locked files. 
 
 ```
 Usage:
-  ue4-datasync.ps1 [-mode:]<push|pull> [[-path:]syncpath] [Options]
+  ue-datasync.ps1 [-mode:]<push|pull> [[-path:]syncpath] [Options]
 
   -mode        : Whether to push or pull the built data from your filesystem
   -root        : Root folder to sync files to/from. Project name will be appended to this path.
@@ -61,7 +61,7 @@ Usage:
                : (should be root of project)
   -prune       : Clean up versions of the data older than the latest
   -force       : Copy ALL BuiltData files regardless of size/timestamp checks
-  -nocloseeditor : Don't close UE4 editor (this will prevent download of updated files)
+  -nocloseeditor : Don't close Unreal editor (this will prevent download of updated files)
   -dryrun      : Don't perform any actual actions, just report on what you would do
   -verbose     : Print more information
   -help        : Print this help
@@ -85,7 +85,7 @@ what happens in each mode.
 
 ### Push mode
 
-> Example: `ue4-datasync.ps1 push`
+> Example: `ue-datasync.ps1 push`
 >
 > Assuming you run this in your project root and have defined the environment variable UESYNCROOT
 
@@ -107,7 +107,7 @@ umap on this shared drive, without it being in the git repo.
 
 ### Pull mode
 
-> Example: `ue4-datasync.ps1 pull`
+> Example: `ue-datasync.ps1 pull`
 >
 > Assuming you run this in your project root and have defined the environment variable UESYNCROOT
 
@@ -145,7 +145,7 @@ you only do it for the `push` variant.
 
 ## Automating this
 
-You can use `ue4-datasync.ps1` manually, calling it in `push` mode just after 
+You can use `ue-datasync.ps1` manually, calling it in `push` mode just after 
 you push any map changes (assuming you've built the lighting), and in `pull` mode
 on demand, as and when you know you want to pick up new lighting data that others
 have built.

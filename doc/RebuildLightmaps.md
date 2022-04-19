@@ -13,7 +13,7 @@ automatically determine which maps to rebuild if you want, or you can
 explicitly list them as arguments: 
 
 ```
-  ue4-rebuild-lightmaps.ps1 [-src:sourcefolder] [-quality:(preview|medium|high|production)]  [-maps Map1,Map2,Map3] [-dryrun]
+  ue-rebuild-lightmaps.ps1 [-src:sourcefolder] [-quality:(preview|medium|high|production)]  [-maps Map1,Map2,Map3] [-dryrun]
 
   -src          : Source folder (current folder if omitted)
   -quality      : Lightmap quality, preview/medium/high/production

@@ -147,7 +147,7 @@ zipped packages will be created in.
 *Optional Setting - string* 
 
 By default, scripts will locate your `.uproject` file automatically in the root of
-your UE4 project folder. If for any reason you have more than one, you can 
+your Unreal project folder. If for any reason you have more than one, you can 
 specify which to use with this setting.
 
 ## Package Variants

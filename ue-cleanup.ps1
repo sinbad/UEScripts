@@ -10,7 +10,7 @@ function Print-Usage {
     Write-Output "Steve's Unreal Project Cleanup Tool"
     Write-Output "   Clean up hot-reload DLLs & prune LFS to free space. Will close Unreal editor!"
     Write-Output "Usage:"
-    Write-Output "  ue4-cleanup.ps1 [[-src:]sourcefolder] [Options]"
+    Write-Output "  ue-cleanup.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"

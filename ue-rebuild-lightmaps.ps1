@@ -24,7 +24,7 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal lightmap rebuilding tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-rebuild-lightmaps.ps1 [-src:sourcefolder] [-quality:(preview|medium|high|production)]  [-maps Map1,Map2,Map3] [-dryrun]"
+    Write-Output "  ue-rebuild-lightmaps.ps1 [-src:sourcefolder] [-quality:(preview|medium|high|production)]  [-maps Map1,Map2,Map3] [-dryrun]"
     Write-Output " "
     Write-Output "  -src          : Source folder (current folder if omitted)"
     Write-Output "  -quality      : Lightmap quality, preview/medium/high/production"

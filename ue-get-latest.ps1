@@ -10,7 +10,7 @@ function Print-Usage {
     Write-Output "Steve's Unreal Get Latest Tool"
     Write-Output "   Get latest from repo and build for dev. Will close Unreal editor!"
     Write-Output "Usage:"
-    Write-Output "  ue4-get-latest.ps1 [[-src:]sourcefolder] [Options]"
+    Write-Output "  ue-get-latest.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
@@ -78,7 +78,7 @@ try {
             $cleanupargs += "-dryrun"
         }
         # Use Invoke-Expression so we can use a string as options
-        Invoke-Expression "&'$PSScriptRoot/ue4-cleanup.ps1' $cleanupargs"
+        Invoke-Expression "&'$PSScriptRoot/ue-cleanup.ps1' $cleanupargs"
 
         # Stopped using rebase because it's a PITA when it goes wrong
         Write-Output "Pulling latest from Git..."
@@ -97,20 +97,9 @@ try {
             }
         }
     } else {
-        # Assume svn
+        # Support Perforce?
 
-        # Hard coded for Subversion right now
-        if ($dryrun) {
-            Write-Output "Checking for updates we WOULD do:"
-            svn status --show-updates
-        } else {
-            Write-Output "Updating to latest..."
-            svn up
-        }
-
-        if ($LASTEXITCODE -ne 0) {
-            throw "Subversion update failed, see above"
-        }
+        throw "Get Latest only supports Git right now"
     }
 
     # Now build
@@ -122,7 +111,7 @@ try {
         $cmdargs += "-dryrun"
     }
     # Use Invoke-Expression so we can use a string as options
-    Invoke-Expression "&'$PSScriptRoot/ue4-build.ps1' dev $cmdargs"
+    Invoke-Expression "&'$PSScriptRoot/ue-build.ps1' dev $cmdargs"
 
     if ($LASTEXITCODE -ne 0) {
         throw "Build process failed, see above"
@@ -138,7 +127,7 @@ try {
             $cmdargs += "-dryrun"
         }
         # Use Invoke-Expression so we can use a string as options
-        Invoke-Expression "&'$PSScriptRoot/ue4-datasync.ps1' pull $cmdargs"
+        Invoke-Expression "&'$PSScriptRoot/ue-datasync.ps1' pull $cmdargs"
     
     }
 

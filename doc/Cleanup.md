@@ -8,7 +8,7 @@ I don't use this script very much any more because I'm using Live Coding now.
 The script also cleans up Live Coding patches but there's fewer of those.
 
 ```
-  ue4-cleanup.ps1 [[-src:]sourcefolder] [Options]
+  ue-cleanup.ps1 [[-src:]sourcefolder] [Options]
 
   -src         : Source folder (current folder if omitted)
                : (should be root of project)

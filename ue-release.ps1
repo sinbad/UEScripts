@@ -26,7 +26,7 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal release tool"
     Write-Output "Usage:"
-    Write-Output "  ue4-release.ps1 [-version:ver|-latest] -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
+    Write-Output "  ue-release.ps1 [-version:ver|-latest] -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
     Write-Output " "
     Write-Output "  -version:ver        : Version to release; must have been packaged already"
     Write-Output "  -latest             : Instead of an explicit version, release one identified in project settings"
