@@ -70,6 +70,9 @@ try {
 
     # Import config
     $config = Read-Package-Config -srcfolder:$src
+    $projfile = Get-Uproject-Filename -srcfolder:$src -config:$config
+    $proj = Read-Uproject $projfile
+    $ueVersion = Get-UE-Version $proj
 
     if ($latest) {
         $version = Get-Project-Version $src
@@ -90,7 +93,7 @@ try {
     foreach ($variantConfig in $variantConfigs) {
 
         # Get source dir
-        $sourcedir = Get-Package-Client-Dir -config:$config -versionNumber:$version -variantName:$variantConfig.Name
+        $sourcedir = Get-Package-Client-Dir -config:$config -versionNumber:$version -variantName:$variantConfig.Name -ueVersion:$ueVersion
 
         if (-not (Test-Path $sourcedir -PathType Container)) {
             Write-Error "Release folder $sourcedir does not exist, skipping"

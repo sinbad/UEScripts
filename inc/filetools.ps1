@@ -47,7 +47,8 @@ function Get-Package-Client-Dir {
     param (
         [PackageConfig]$config,
         [string]$versionNumber,
-        [string]$variantName
+        [string]$variantName,
+        [string]$ueVersion
     )
 
     $root = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$variantName
@@ -56,12 +57,14 @@ function Get-Package-Client-Dir {
     if (-not $variant) {
         throw "Unknown variant $variantName"
     }
+
+    $isUE5 = $ueVersion.StartsWith("5.")
     # Note, currently only supporting "Game" platform type, not separate client / server
     $subfolder = switch ($variant.Platform) {
-        "Win32" { "WindowsNoEditor" }
-        "Win64" { "WindowsNoEditor" }
-        "Linux" { "LinuxNoEditor" }
-        "Mac" { "MacNoEditor" }
+        "Win32" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
+        "Win64" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
+        "Linux" { if ($isUE5) { "Linux" } else { "LinuxNoEditor" } }
+        "Mac" { if ($isUE5) { "Mac" } else { "MacNoEditor" } }
         Default { throw "Unsupported platform $($variant.Platform)" }
     }
 
