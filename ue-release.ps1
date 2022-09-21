@@ -18,6 +18,7 @@ param (
 . $PSScriptRoot\inc\platform.ps1
 . $PSScriptRoot\inc\packageconfig.ps1
 . $PSScriptRoot\inc\projectversion.ps1
+. $PSScriptRoot\inc\uproject.ps1
 . $PSScriptRoot\inc\filetools.ps1
 . $PSScriptRoot\inc\steam.ps1
 . $PSScriptRoot\inc\itch.ps1
