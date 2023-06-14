@@ -34,3 +34,18 @@ in the root of your plugin, next to the .uplugin file. The options are:
     "OutputDir": "C:\\Users\\Steve\\MarketplaceBuilds",
     "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin"
 }
+
+## Excluding Files
+
+By default, the plugin packaging process automatically excludes common
+files and directories that shouldn't be there:
+
+./.git/
+./.git*
+./Binaries/
+./Intermediate/
+./Saved/
+./pluginconfig.json
+
+If you'd like to exclude other things, create a file called `packageexclusions.txt`
+in the root of the plugin, listing files/folders you want to exclude (one per line).
