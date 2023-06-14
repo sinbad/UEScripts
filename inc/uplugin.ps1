@@ -9,14 +9,14 @@ function Get-Uplugin-Filename {
 
     $projfile = ""
     if ($config -and $config.ProjectFile) {
-        if (-not [System.IO.Path]::IsPathRooted($config.ProjectFile)) {
-            $projfile = Join-Path $srcfolder $config.ProjectFile
+        if (-not [System.IO.Path]::IsPathRooted($config.PluginFile)) {
+            $projfile = Join-Path $srcfolder $config.PluginFile
         } else {
-            $projfile = Resolve-Path $config.ProjectFile
+            $projfile = Resolve-Path $config.PluginFile
         }
 
         if (-not (Test-Path $projfile)) {
-            throw "Invalid ProfileFile setting, $($config.ProjectFile) does not exist."
+            throw "Invalid ProfileFile setting, $($config.PluginFile) does not exist."
         }
 
     } else {
