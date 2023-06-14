@@ -206,6 +206,7 @@ try {
     $argList.Add("-x!$pluginName\.git*") > $null
     $argList.Add("-x!$pluginName\Binaries\") > $null
     $argList.Add("-x!$pluginName\Intermediate\") > $null
+    $argList.Add("-x!$pluginName\Saved\") > $null
     $argList.Add("-x!$pluginName\pluginconfig.json") > $null
 
     if (Test-Path $excludefile) {
