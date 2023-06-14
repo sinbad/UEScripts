@@ -26,7 +26,11 @@ function Get-Uproject-Filename {
     }
 
     # Resolve to absolute (do it here and not in join so missing file is friendlier error)
-    return Resolve-Path $projfile
+    if ($projfile) {
+        return Resolve-Path $projfile
+    } else {
+        return $projfile
+    }
 }
 
 # Read the uproject file and return as a PSCustomObject

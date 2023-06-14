@@ -1,0 +1,8 @@
+{
+    "OutputDir": "/Path/To/Output/Parent/Dir",
+
+    "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin"
+
+}
+
+
