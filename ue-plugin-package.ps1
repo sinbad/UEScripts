@@ -124,11 +124,18 @@ try {
     }
     $proj = Read-Uproject $pluginfile
     $pluginName = (Get-Item $pluginfile).Basename
-    $saveuplugin = $false
+
+    # Default to latest engine if not specified
+    if (-not $config.EngineVersions -or $config.EngineVersions.Length -eq 0) {
+        Write-Output "Warning: EngineVersions missing from pluginconfig.json, assuming latest only"
+        $config.EngineVersions = [System.Collections.ArrayList]@()
+        $config.EngineVersions.add($proj.EngineVersion) > $null
+    }
 
     Write-Output ""
     Write-Output "Plugin File     : $pluginfile"
     Write-Output "Output Folder   : $($config.OutputDir)"
+    Write-Output "Engine Versions : $($config.EngineVersions -join ", ")"
     Write-Output ""
 
     if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -eq 0) {
@@ -141,7 +148,6 @@ try {
             $versionNumber = Get-NextPluginVersion -current:$versionNumber -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix
             # Save incremented version back to uplugin object (will be saved later)
             $proj.VersionName = $versionNumber
-            $saveuplugin = $true
         }
         catch {
             Write-Output $_.Exception.Message
@@ -169,85 +175,78 @@ try {
     if (-not $proj.Installed) {
         # Need to set the installed=true for marketplace
         $proj.Installed = $true
-        $saveuplugin = $true
         $resetinstalled = $true
     }
 
+    # Marketplace requires you to submit one package per EngineVersion for code plugins
+    # Pretty dumb since the only diff is the EngineVersion in .uplugin but sure
+    $oldEngineVer = $proj.EngineVersion
+    foreach ($EngineVer in $config.EngineVersions) {
+        Write-Output "Packaging for Engine Version $EngineVer"
+        $proj.EngineVersion = $EngineVer
 
-    if ($saveuplugin) {
         $newjson = ($proj | ConvertTo-Json -depth 100)
-        if ($dryrun) {
-            Write-Output ""
-            Write-Output "Would have updated .uproject to:"
-            Write-Output $newjson
-            Write-Output ""
-    
-        } else {
+        if (-not $dryrun) {
             Write-Output "Writing updates to .uproject"
             $newjson | Out-File $pluginfile
         }
 
-    }
+        # Zip parent of the uplugin folder
+        $zipsrc = (Get-Item $pluginfile).Directory.FullName
+        $zipdst = Join-Path $config.OutputDir "$($pluginName)_v$($versionNumber)_UE$($EngineVer).zip"
+        $excludefilename = "packageexclusions.txt"
+        $excludefile = Join-Path $zipsrc $excludefilename
 
-    # Zip parent of the uplugin folder
-    $zipsrc = (Get-Item $pluginfile).Directory.FullName
-    $zipdst = Join-Path $config.OutputDir "$($pluginName)_$($versionNumber).zip"
-    $excludefilename = "packageexclusions.txt"
-    $excludefile = Join-Path $zipsrc $excludefilename
+        New-Item -ItemType Directory -Path $config.OutputDir -Force > $null
+        Write-Output "Compressing to $zipdst"
 
-    New-Item -ItemType Directory -Path $config.OutputDir -Force > $null
-    Write-Output "Compressing to $zipdst"
+        $argList = [System.Collections.ArrayList]@()
+        $argList.Add("a") > $null
+        $argList.Add($zipdst) > $null
+        # Standard exclusions
+        $argList.Add("-x!$pluginName\.git\") > $null
+        $argList.Add("-x!$pluginName\.git*") > $null
+        $argList.Add("-x!$pluginName\Binaries\") > $null
+        $argList.Add("-x!$pluginName\Intermediate\") > $null
+        $argList.Add("-x!$pluginName\Saved\") > $null
+        $argList.Add("-x!$pluginName\pluginconfig.json") > $null
 
-    $argList = [System.Collections.ArrayList]@()
-    $argList.Add("a") > $null
-    $argList.Add($zipdst) > $null
-    # Standard exclusions
-    $argList.Add("-x!$pluginName\.git\") > $null
-    $argList.Add("-x!$pluginName\.git*") > $null
-    $argList.Add("-x!$pluginName\Binaries\") > $null
-    $argList.Add("-x!$pluginName\Intermediate\") > $null
-    $argList.Add("-x!$pluginName\Saved\") > $null
-    $argList.Add("-x!$pluginName\pluginconfig.json") > $null
-
-    if (Test-Path $excludefile) {
-        $argList.Add("-x@`"$excludefile`"") > $null
+        if (Test-Path $excludefile) {
+            $argList.Add("-x@`"$excludefile`"") > $null
         $argList.Add("-x!$pluginName\$excludefilename") > $null
-    }
+        }
 
-    $argList.Add($zipsrc) > $null
+        $argList.Add($zipsrc) > $null
 
-    if ($dryrun) {
-        Write-Output ""
-        Write-Output "Would have run:"
-        Write-Output "> 7z.exe $($argList -join " ")"
-        Write-Output ""
+        if ($dryrun) {
+            Write-Output ""
+            Write-Output "Would have run:"
+            Write-Output "> 7z.exe $($argList -join " ")"
+            Write-Output ""
 
-    } else {            
-        $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
-        if ($proc.ExitCode -ne 0) {
-            throw "7-Zip failed!"
+        } else {            
+            $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
+            if ($proc.ExitCode -ne 0) {
+                throw "7-Zip failed!"
+            }
+
         }
 
     }
 
-    # Reset the installed flag back to how it was, for convenience 
+
+    # Reset the uplugin
     # Otherwise UE keeps prompting to update project files when using it as source
     if ($resetinstalled) {
         $proj.Installed = $false
-        $newjson = ($proj | ConvertTo-Json -depth 100)
-        if ($dryrun) {
-            Write-Output ""
-            Write-Output "Would have updated .uproject to:"
-            Write-Output $newjson
-            Write-Output ""
-    
-        } else {
-            Write-Output "Writing updates to .uproject"
-            $newjson | Out-File $pluginfile
-        }
-
     }
+    $proj.EngineVersion = $oldEngineVer
 
+    if (-not $dryrun) {
+        $newjson = ($proj | ConvertTo-Json -depth 100)
+        Write-Output "Resetting .uproject"
+        $newjson | Out-File $pluginfile
+    }
 
 
     if ($browse -and -not $dryrun) {

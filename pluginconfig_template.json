@@ -1,7 +1,14 @@
 {
     "OutputDir": "/Path/To/Output/Parent/Dir",
 
-    "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin"
+    "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin",
+
+    "EngineVersions":
+    [
+        "5.0",
+        "5.1",
+        "5.2"
+    ]
 
 }
 

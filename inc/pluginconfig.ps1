@@ -2,6 +2,8 @@
 
 class PluginConfig {
     [string]$OutputDir
+    [string]$PluginFile
+    [array]$EngineVersions
 
     PluginConfig([PSCustomObject]$obj) {
         # Construct from JSON object

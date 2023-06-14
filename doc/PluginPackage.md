@@ -32,8 +32,32 @@ in the root of your plugin, next to the .uplugin file. The options are:
 ```json
 {
     "OutputDir": "C:\\Users\\Steve\\MarketplaceBuilds",
-    "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin"
+    "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin",
+    "EngineVersions":
+    [
+        "5.0.0",
+        "5.1.0",
+        "5.2.0"
+    ]    
 }
+
+`OutputDir` and `EngineVersions` are required.
+
+## Engine Versions
+
+When submitting code plugins to the Marketplace, you're only allowed to include
+a single supported `EngineVersion` in each version you upload. Even though you 
+don't submit built binaries to the Marketplace, the publisher portal requires
+that the .uplugin has a single `EngineVersion` entry.
+
+Therefore to support multiple engine versions, you have to upload several essentially
+identical source archives, with each one having a different `EngineVersion` specified
+in the .uplugin.
+
+This script helps you do that; for each entry in `EngineVersions` in the `pluginconfig.json`,
+a separate zip archive is generated, with the correct version set in the .uplugin.
+
+> It seems you should always use ".0" as the 3rd version digit.
 
 ## Excluding Files
 
