@@ -40,6 +40,7 @@ in the root of your plugin, next to the .uplugin file. The options are:
         "5.2.0"
     ]    
 }
+```
 
 `OutputDir` and `EngineVersions` are required.
 
@@ -64,12 +65,12 @@ a separate zip archive is generated, with the correct version set in the .uplugi
 By default, the plugin packaging process automatically excludes common
 files and directories that shouldn't be there:
 
-./.git/
-./.git*
-./Binaries/
-./Intermediate/
-./Saved/
-./pluginconfig.json
+* ./.git/
+* ./.git*
+* ./Binaries/
+* ./Intermediate/
+* ./Saved/
+* ./pluginconfig.json
 
 If you'd like to exclude other things, create a file called `packageexclusions.txt`
 in the root of the plugin, listing files/folders you want to exclude (one per line).
