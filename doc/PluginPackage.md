@@ -4,9 +4,12 @@ To distribute a plugin on the marketplace, you need to zip it up and make sure
 you only include approved files. The `ue-plugin-package.ps1` script is here
 to make that job easier.
 
-> Note: unless you use the `-keepversion`, the script will update your .uplugin
-> file to record the new version number and potentially set Installed=true.
-> Unfortunately the first time, this will probably mess with indents.
+> **Note:** This script will update your .uplugin file to record the new version number,
+> and manipulate EngineVersion for each build. Its state will be restored afterwards
+> (apart from the version number). 
+>
+> Unfortunately the first time, this will probably mess with indenting because
+> of a difference of opinion between JSON libraries. But it's harmless.
 
 ```sh
 Usage:
