@@ -16,6 +16,7 @@ These scripts support **UE4 and UE5** and will detect which one your project is 
 * [Getting Latest for Artists](./doc/GetLatest.md): pulls from git and builds so C++ changes are automatically updated
 * [Synchronising BuiltData Files outside of Git](./doc/DataSync.md)
 * [Cleaning Up](./doc/Cleanup.md): Deleting unneeded Hot Reload DLLs etc
+* [Packaging a Marketplace Plugin](./doc/PluginPackage.md)
 
 
 ## Prerequisites
