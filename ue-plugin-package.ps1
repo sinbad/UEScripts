@@ -13,6 +13,8 @@ param (
     [switch]$keepversion = $false,
     # Force move tag
     [switch]$forcetag = $false,
+    # Never tag
+    [switch]$notag = $false,
     # Testing mode; skips clean checks, tags
     [switch]$test = $false,
     # Browse the output directory in file explorer after packaging
@@ -42,6 +44,7 @@ function Write-Usage {
     Write-Output "  -hotfix       : Increment hotfix version i.e. x.x.x.[x++]"
     Write-Output "  -keepversion  : Keep current version number, doesn't tag unless -forcetag"
     Write-Output "  -forcetag     : Move any existing version tag"
+    Write-Output "  -notag        : Don't tag even if updating version"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
     Write-Output "  -browse       : After packaging, browse the output folder"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
@@ -121,6 +124,7 @@ try {
     }
     $proj = Read-Uproject $pluginfile
     $pluginName = (Get-Item $pluginfile).Basename
+    $saveuplugin = $false
 
     Write-Output ""
     Write-Output "Plugin File     : $pluginfile"
@@ -137,6 +141,7 @@ try {
             $versionNumber = Get-NextPluginVersion -current:$versionNumber -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix
             # Save incremented version back to uplugin object (will be saved later)
             $proj.VersionName = $versionNumber
+            $saveuplugin = $true
         }
         catch {
             Write-Output $_.Exception.Message
@@ -147,7 +152,7 @@ try {
 
     # For tagging release
     # We only need to grab the main version once
-    if ((-not $keepversion) -or $forcetag) {
+    if ((-not ($keepversion -or $notag)) -or $forcetag) {
         $forcearg = ""
         if ($forcetag) {
             $forcearg = "-f"
@@ -160,7 +165,29 @@ try {
         }
     }
 
-    # TODO: Save .uplugin changes!
+    $resetinstalled = $false
+    if (-not $proj.Installed) {
+        # Need to set the installed=true for marketplace
+        $proj.Installed = $true
+        $saveuplugin = $true
+        $resetinstalled = $true
+    }
+
+
+    if ($saveuplugin) {
+        $newjson = ($proj | ConvertTo-Json -depth 100)
+        if ($dryrun) {
+            Write-Output ""
+            Write-Output "Would have updated .uproject to:"
+            Write-Output $newjson
+            Write-Output ""
+    
+        } else {
+            Write-Output "Writing updates to .uproject"
+            $newjson | Out-File $pluginfile
+        }
+
+    }
 
     # Zip parent of the uplugin folder
     $zipsrc = (Get-Item $pluginfile).Directory.FullName
@@ -201,6 +228,25 @@ try {
         }
 
     }
+
+    # Reset the installed flag back to how it was, for convenience 
+    # Otherwise UE keeps prompting to update project files when using it as source
+    if ($resetinstalled) {
+        $proj.Installed = $false
+        $newjson = ($proj | ConvertTo-Json -depth 100)
+        if ($dryrun) {
+            Write-Output ""
+            Write-Output "Would have updated .uproject to:"
+            Write-Output $newjson
+            Write-Output ""
+    
+        } else {
+            Write-Output "Writing updates to .uproject"
+            $newjson | Out-File $pluginfile
+        }
+
+    }
+
 
 
     if ($browse -and -not $dryrun) {
