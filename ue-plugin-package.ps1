@@ -165,6 +165,8 @@ try {
     # Zip parent of the uplugin folder
     $zipsrc = (Get-Item $pluginfile).Directory.FullName
     $zipdst = Join-Path $config.OutputDir "$($pluginName)_$($versionNumber).zip"
+    $excludefilename = "packageexclusions.txt"
+    $excludefile = Join-Path $zipsrc $excludefilename
 
     New-Item -ItemType Directory -Path $config.OutputDir -Force > $null
     Write-Output "Compressing to $zipdst"
@@ -172,6 +174,18 @@ try {
     $argList = [System.Collections.ArrayList]@()
     $argList.Add("a") > $null
     $argList.Add($zipdst) > $null
+    # Standard exclusions
+    $argList.Add("-x!$pluginName\.git\") > $null
+    $argList.Add("-x!$pluginName\.git*") > $null
+    $argList.Add("-x!$pluginName\Binaries\") > $null
+    $argList.Add("-x!$pluginName\Intermediate\") > $null
+    $argList.Add("-x!$pluginName\pluginconfig.json") > $null
+
+    if (Test-Path $excludefile) {
+        $argList.Add("-x@`"$excludefile`"") > $null
+        $argList.Add("-x!$pluginName\$excludefilename") > $null
+    }
+
     $argList.Add($zipsrc) > $null
 
     if ($dryrun) {
