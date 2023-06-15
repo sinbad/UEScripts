@@ -1,7 +1,8 @@
 
 
 class PluginConfig {
-    [string]$OutputDir
+    [string]$PackageDir
+    [string]$BuildDir
     [string]$PluginFile
     [array]$EngineVersions
 

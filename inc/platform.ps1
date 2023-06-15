@@ -15,3 +15,14 @@ if ($IsWindows) {
 if ($IsWindows) {
     $batchSuffix = ".bat"
 }
+
+
+function Get-Platform {
+    if ($IsWindows) {
+        return "Win64"
+    } elseif ($IsLinux) {
+        return "Linux"
+    } else {
+        return "Mac"
+    }
+}

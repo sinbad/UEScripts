@@ -11,7 +11,7 @@ to make that job easier.
 > Unfortunately the first time, this will probably mess with indenting because
 > of a difference of opinion between JSON libraries. But it's harmless.
 
-```sh
+```
 Usage:
   ue-plugin-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [options...]
 
@@ -34,7 +34,7 @@ in the root of your plugin, next to the .uplugin file. The options are:
 
 ```json
 {
-    "OutputDir": "C:\\Users\\Steve\\MarketplaceBuilds",
+    "PackageDir": "C:\\Users\\Steve\\MarketplaceBuilds",
     "PluginFile": "OptionalPluginFilenameWillDetectInDirOtherwise.uplugin",
     "EngineVersions":
     [
@@ -45,7 +45,7 @@ in the root of your plugin, next to the .uplugin file. The options are:
 }
 ```
 
-`OutputDir` and `EngineVersions` are required.
+`PackageDir` and `EngineVersions` are required.
 
 ## Engine Versions
 

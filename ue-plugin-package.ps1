@@ -134,7 +134,7 @@ try {
 
     Write-Output ""
     Write-Output "Plugin File     : $pluginfile"
-    Write-Output "Output Folder   : $($config.OutputDir)"
+    Write-Output "Output Folder   : $($config.PackageDir)"
     Write-Output "Engine Versions : $($config.EngineVersions -join ", ")"
     Write-Output ""
 
@@ -193,11 +193,11 @@ try {
 
         # Zip parent of the uplugin folder
         $zipsrc = (Get-Item $pluginfile).Directory.FullName
-        $zipdst = Join-Path $config.OutputDir "$($pluginName)_v$($versionNumber)_UE$($EngineVer).zip"
+        $zipdst = Join-Path $config.PackageDir "$($pluginName)_v$($versionNumber)_UE$($EngineVer).zip"
         $excludefilename = "packageexclusions.txt"
         $excludefile = Join-Path $zipsrc $excludefilename
 
-        New-Item -ItemType Directory -Path $config.OutputDir -Force > $null
+        New-Item -ItemType Directory -Path $config.PackageDir -Force > $null
         Write-Output "Compressing to $zipdst"
 
         $argList = [System.Collections.ArrayList]@()
@@ -250,7 +250,7 @@ try {
 
 
     if ($browse -and -not $dryrun) {
-        Invoke-Item $config.OutputDir
+        Invoke-Item $config.PackageDir
     }
 
 }

@@ -51,7 +51,12 @@ function Get-UE-Version {
         [psobject]$uproject
     )
 
-    return $uproject.EngineAssociation
+    if ($uproject.EngineAssociation) {
+        return $uproject.EngineAssociation
+    } else {
+        # Plugin
+        return $uproject.EngineVersion
+    }
 }
 
 function Get-Is-UE5 {
@@ -88,7 +93,13 @@ function Get-UE-Install {
             $uroot = "C:\Program Files\Epic Games"
         } 
 
-        $uinstall = Join-Path $uroot "UE_$ueVersion"
+        # When using $ueVersion, strip off 3rd digit if any
+        $regex = "(\d+\.\d+)(\.\d+)?"
+        $match = $ueVersion | Select-String -Pattern $regex
+
+        $ueVersionTrimmed = $match.Matches[0].Groups[1].Value
+        
+        $uinstall = Join-Path $uroot "UE_$ueVersionTrimmed"
     }
 
     # Test we can find RunUAT.bat
