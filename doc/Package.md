@@ -107,10 +107,18 @@ package output will be in `$OutputDir/1.1.2.0/PublicSteamWin64/`
 Sometimes you want your packaged EXE to be called something other than your main
 target game module; unfortunately UE doesn't allow you to change it in the project
 settings (without renaming your module, which is very inconvenient); but simply
-renaming it after building works fine, and means you can present a more pleasing
+renaming the EXE after building works fine, and means you can present a more pleasing
 EXE name in your build.
 
 Set `RenameExe` to the name you want your EXE to have, without the `.exe` extension.
+
+> Technically speaking the main EXE in the root of your package dir is a boostrapper
+> for another EXE inside your package, which is still called the same name as the
+> main target module. However, the display name of this process is set in your
+> Project Settings, so it looks OK in e.g. Windows Task Manager. Using lower level
+> process listing tools will reveal the EXE is named after the target module name
+> though. If you don't like this, you'll have to rename your main target module,
+> or create a small wrapper module which solely acts as the main target.
 
 ### 9. Optionally Zip Packaged Build
 
