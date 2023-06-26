@@ -191,9 +191,16 @@ try {
         }
     }
 
-    # Create project sync dir if necessary
+    # Create project sync dir if necessary when pushing
     $syncdir = Join-Path $root $uprojname
-    New-Item -ItemType Directory $syncdir -Force > $null
+    if ($mode -eq "push") {
+        New-Item -ItemType Directory $syncdir -Force > $null
+    } elseif (-not (Test-Path $syncdir)) {
+        # Abort, no need to pull anything
+        Write-Output "No sync dir at $syncdir, aborting"
+        Exit 0
+    }
+
     Write-Output "Sync project folder: $syncdir"
 
     $umaps = Get-Current-Umaps
