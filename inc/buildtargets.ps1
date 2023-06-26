@@ -5,9 +5,11 @@ function Find-DefaultTarget {
         [string]$preferred = "Editor"
     )
 
+    $sourcefolder = Join-Path (Resolve-Path $srcfolder) "Source"
+
     # Enumerate the Target.cs files in Source folder and use the default one
     # This lets us not assume what the modules are called exactly
-    $targetFiles = Get-ChildItem (Join-Path $srcfolder "Source" "*.Target.cs")
+    $targetFiles = Get-ChildItem "$sourcefolder\*.Target.cs"
 
     foreach ($file in $targetfiles) {
         if ($file.Name -like "*$preferred.Target.cs") {
