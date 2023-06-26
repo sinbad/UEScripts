@@ -69,16 +69,17 @@ try {
             }
         }
 
-        # Run cleanup tool
-        $cleanupargs = @()
-        if ($nocloseeditor) {
-            $cleanupargs += "-nocloseeditor"
-        }
-        if ($dryrun) {
-            $cleanupargs += "-dryrun"
-        }
-        # Use Invoke-Expression so we can use a string as options
-        Invoke-Expression "&'$PSScriptRoot/ue-cleanup.ps1' $cleanupargs"
+        # Actually don't clean up anymore, no longer needed
+        # # Run cleanup tool
+        # $cleanupargs = @()
+        # if ($nocloseeditor) {
+        #     $cleanupargs += "-nocloseeditor"
+        # }
+        # if ($dryrun) {
+        #     $cleanupargs += "-dryrun"
+        # }
+        # # Use Invoke-Expression so we can use a string as options
+        # Invoke-Expression "&'$PSScriptRoot/ue-cleanup.ps1' $cleanupargs"
 
         # Stopped using rebase because it's a PITA when it goes wrong
         Write-Output "Pulling latest from Git..."
