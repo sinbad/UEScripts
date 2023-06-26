@@ -102,6 +102,16 @@ The destination of the package operation is generated from a combination of:
 Therefore if you're building variant "PublicSteamWin64" at version 1.1.2.0, the
 package output will be in `$OutputDir/1.1.2.0/PublicSteamWin64/`
 
+### Optionally Rename EXE
+
+Sometimes you want your packaged EXE to be called something other than your main
+target game module; unfortunately UE doesn't allow you to change it in the project
+settings (without renaming your module, which is very inconvenient); but simply
+renaming it after building works fine, and means you can present a more pleasing
+EXE name in your build.
+
+Set `RenameExe` to the name you want your EXE to have, without the `.exe` extension.
+
 ### 9. Optionally Zip Packaged Build
 
 If you've enabled the `Zip` option for a given variant in [packageconfig.json](PackageConfig.md),

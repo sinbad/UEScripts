@@ -5,6 +5,7 @@
     "ProjectFile": "OptionalProjectFilenameWillDetectInDirOtherwise.uproject",
 
     "Target": "GameTargetName",
+    "RenameExe": "NewExeNameWithNoExtension",
     "CookAllMaps": true,    
     "MapsIncluded": [
         "IfCookAllMapsIsFalse",

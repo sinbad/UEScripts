@@ -54,6 +54,8 @@ class PackageConfig {
     # Will be structured $OutputDir/$version/$variant
     # If relative, will be considered relative to source folder
     [string]$OutputDir
+    # Optional name to rename the output EXE to
+    [string]$RenameExe
     # Folder to place zipped releases (named $target_$platform_$variant_$version.zip)
     # If relative, will be considered relative to source folder
     [string]$ZipDir

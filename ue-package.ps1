@@ -272,6 +272,25 @@ try {
 
         }
 
+        if ($config.RenameExe.Length -gt 0) {
+            if ($dryrun) {
+                Write-Output "Would have renamed EXE from $($config.Target) to $($config.RenameExe)"
+            } else {
+                # Rename the executable
+                $subdirs = @(Get-ChildItem $outdir)
+                $subdirs | ForEach-Object {
+                    $renameExeSuffix = ""
+                    if ($var.Platform -like "Win*") {
+                        $renameExeSuffix = ".exe"
+                    }
+                    $exeSrcName = Join-Path $_.FullName "$($config.Target)$renameExeSuffix"
+                    $exeDestName = Join-Path $_.FullName "$($config.RenameExe)$renameExeSuffix"
+                    Move-Item $exeSrcName $exeDestName -Force
+                }
+            }
+            
+        }
+
         if ($var.Zip) {
             if ($dryrun) {
                 Write-Output "Would have compressed $outdir to $(Join-Path $config.ZipDir "$($config.Target)_$($versionNumber)_$($var.Name).zip")"
