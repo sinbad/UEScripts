@@ -12,10 +12,11 @@ specified in the .uplugin file.
 Usage:
   ue-build-plugin.ps1 [[-src:]sourcefolder] [Options]
 
-  -src         : Source folder (current folder if omitted)
-               : (should be root of project)
-  -dryrun      : Don't perform any actual actions, just report on what you would do
-  -help        : Print this help
+  -src          : Source folder (current folder if omitted)
+                : (should be root of project)
+  -allplatforms : Build for all platforms, not just the current one
+  -dryrun       : Don't perform any actual actions, just report on what you would do
+  -help         : Print this help
 
 Environment Variables:
   UEINSTALL   : Use a specific Unreal install.
