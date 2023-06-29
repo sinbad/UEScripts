@@ -2,6 +2,7 @@
 param (
     [string]$mode,
     [string]$src,
+    [switch]$allplatforms = $false,
     [switch]$nocloseeditor = $false,
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -19,10 +20,11 @@ function Print-Usage {
     Write-Output "Usage:"
     Write-Output "  ue-build-plugin.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
-    Write-Output "  -src         : Source folder (current folder if omitted)"
-    Write-Output "               : (should be root of project)"
-    Write-Output "  -dryrun      : Don't perform any actual actions, just report on what you would do"
-    Write-Output "  -help        : Print this help"
+    Write-Output "  -src          : Source folder (current folder if omitted)"
+    Write-Output "                : (should be root of project)"
+    Write-Output "  -allplatforms : Build for all platforms, not just the current one"
+    Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
+    Write-Output "  -help         : Print this help"
     Write-Output " "
     Write-Output "Environment Variables:"
     Write-Output "  UEINSTALL   : Use a specific Unreal install."
@@ -74,14 +76,17 @@ try {
 
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
-    $targetPlatform = Get-Platform
 
     $argList = [System.Collections.ArrayList]@()
     $argList.Add("BuildPlugin") > $null
     $argList.Add("-Plugin=`"$pluginfile`"") > $null
     $argList.Add("-Package=`"$($config.BuildDir)`"") > $null
     $argList.Add("-Rocket") > $null
-    $argList.Add("-TargetPlatforms=$targetPlatform") > $null
+
+    if (-not $allplatforms) {
+        $targetPlatform = Get-Platform
+        $argList.Add("-TargetPlatforms=$targetPlatform") > $null    
+    }
 
     if ($dryrun) {
         Write-Output ""
