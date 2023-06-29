@@ -224,7 +224,8 @@ try {
             Write-Output "> 7z.exe $($argList -join " ")"
             Write-Output ""
 
-        } else {            
+        } else {      
+            Remove-Item -Path $zipdst -Force
             $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
             if ($proc.ExitCode -ne 0) {
                 throw "7-Zip failed!"
