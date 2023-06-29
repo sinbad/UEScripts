@@ -32,3 +32,15 @@ function Get-Uplugin-Filename {
         return $projfile
     }
 }
+
+function Update-UpluginUeVersion {
+    [string]$srcfolder,
+    [PluginConfig]$config,
+    [string]$version
+
+    $pluginfile = Get-Uplugin-Filename $srcfolder $config
+    $plugincontents = (Get-Content $pluginfile) | ConvertFrom-Json
+    $proj.EngineVersion = $version
+    $newjson = ($plugincontents | ConvertTo-Json -depth 100)
+    $newjson | Out-File $pluginfile
+}

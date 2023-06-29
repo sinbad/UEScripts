@@ -3,6 +3,8 @@ param (
     [string]$mode,
     [string]$src,
     [switch]$allplatforms = $false,
+    [switch]$allversions = $false,
+    [string]$uever = "",
     [switch]$nocloseeditor = $false,
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -23,6 +25,9 @@ function Print-Usage {
     Write-Output "  -src          : Source folder (current folder if omitted)"
     Write-Output "                : (should be root of project)"
     Write-Output "  -allplatforms : Build for all platforms, not just the current one"
+    Write-Output "  -allversions  : Build for all supported UE versions, not just the current one"
+    Write-Output "                : (specified in pluginconfig.json, only works with lancher-installed UE)"
+    Write-Output "  -uever:5.x.x  : Build for a specific UE version, not the current one (launcher only)"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
     Write-Output " "
@@ -64,43 +69,69 @@ try {
     }
 
     $proj = Read-Uproject $pluginfile
-    $ueVersion = Get-UE-Version $proj
-    $ueinstall = Get-UE-Install $ueVersion
+    $origUeVersion = Get-UE-Version $proj
+    if ($allversions) {
+        $ueVersions = $config.EngineVersions
+    } elseif ($uever.Length -gt 0) {
+        $ueVersions = @($uever)
+    } else {
+        $ueVersions = @($origUeVersion)
+    }
+
     
     Write-Output ""
-    Write-Output "Project File    : $projfile"
-    Write-Output "UE Version      : $ueVersion"
-    Write-Output "UE Install      : $ueinstall"
+    Write-Output "Project File    : $pluginfile"
+    Write-Output "UE Version(s)   : $($ueVersions -join `", `")"
     Write-Output "Output Folder   : $($config.BuildDir)"
     Write-Output ""
 
-    $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
+    foreach ($ver in $ueVersions) {
 
+        Write-Output "Building for UE Version $ver"
+        $ueinstall = Get-UE-Install $ver
+        $outputDir = Join-Path $config.BuildDir $ver
 
-    $argList = [System.Collections.ArrayList]@()
-    $argList.Add("BuildPlugin") > $null
-    $argList.Add("-Plugin=`"$pluginfile`"") > $null
-    $argList.Add("-Package=`"$($config.BuildDir)`"") > $null
-    $argList.Add("-Rocket") > $null
+        # Need to change the version in the plugin while we build
+        if (-not $dryrun -and ($allversions -or $ueVer.Length -gt 0)) {
+            Update-UpluginUeVersion $src $config $ver
+        }
 
-    if (-not $allplatforms) {
-        $targetPlatform = Get-Platform
-        $argList.Add("-TargetPlatforms=$targetPlatform") > $null    
-    }
+        $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"    
 
-    if ($dryrun) {
-        Write-Output ""
-        Write-Output "Would have run:"
-        Write-Output "> $runUAT $($argList -join " ")"
-        Write-Output ""
+        $argList = [System.Collections.ArrayList]@()
+        $argList.Add("BuildPlugin") > $null
+        $argList.Add("-Plugin=`"$pluginfile`"") > $null
+        $argList.Add("-Package=`"$outputDir`"") > $null
+        $argList.Add("-Rocket") > $null
 
-    } else {            
-        $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
-        if ($proc.ExitCode -ne 0) {
-            throw "RunUAT failed!"
+        if (-not $allplatforms) {
+            $targetPlatform = Get-Platform
+            $argList.Add("-TargetPlatforms=$targetPlatform") > $null    
+        }
+
+        if ($dryrun) {
+            Write-Output ""
+            Write-Output "Would have run:"
+            Write-Output "> $runUAT $($argList -join " ")"
+            Write-Output ""
+
+        } else {            
+            $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
+            if ($proc.ExitCode -ne 0) {
+                # Reset the plugin back to the original UE version
+                if ($allversions -and -not $dryrun) {
+                    Update-UpluginUeVersion $src $config $origUeVersion
+                }
+
+                throw "RunUAT failed!"
+            }
         }
     }
 
+    # Reset the plugin back to the original UE version
+    if ($allversions -and -not $dryrun) {
+        Update-UpluginUeVersion $src $config $origUeVersion
+    }
 
     Write-Output "-- Build plugin process finished OK --"
 
