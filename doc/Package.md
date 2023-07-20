@@ -9,15 +9,14 @@ in the root of your Unreal project. Please see the [Package Config File docs](Pa
 for a full description of this file.
 
 ```
-  ue-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]
+  ue-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-variant=VariantName] [-test] [-dryrun]
 
   -src          : Source folder (current folder if omitted), must contain packageconfig.json
   -major        : Increment major version i.e. [x++].0.0.0
   -minor        : Increment minor version i.e. x.[x++].0.0
   -patch        : Increment patch version i.e. x.x.[x++].0 (default)
   -hotfix       : Increment hotfix version i.e. x.x.x.[x++]
-  -keepversion  : Keep current version number, doesn't tag unless -forcetag
-  -forcetag     : Move any existing version tag
+  -keepversion  : Keep current version number, doesn't tag
   -variants Name1,Name2,Name3
                 : Build only named variants instead of DefaultVariants from packageconfig.json
   -test         : Testing mode, separate builds, allow dirty working copy

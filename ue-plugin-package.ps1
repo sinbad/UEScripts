@@ -11,8 +11,6 @@ param (
     [switch]$hotfix = $false,
     # Don't incrememnt version
     [switch]$keepversion = $false,
-    # Force move tag
-    [switch]$forcetag = $false,
     # Never tag
     [switch]$notag = $false,
     # Testing mode; skips clean checks, tags
@@ -43,7 +41,6 @@ function Write-Usage {
     Write-Output "  -patch        : Increment patch version i.e. x.x.[x++].0 (default)"
     Write-Output "  -hotfix       : Increment hotfix version i.e. x.x.x.[x++]"
     Write-Output "  -keepversion  : Keep current version number, doesn't tag unless -forcetag"
-    Write-Output "  -forcetag     : Move any existing version tag"
     Write-Output "  -notag        : Don't tag even if updating version"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
     Write-Output "  -browse       : After packaging, browse the output folder"
@@ -158,14 +155,11 @@ try {
 
     # For tagging release
     # We only need to grab the main version once
-    if ((-not ($keepversion -or $notag)) -or $forcetag) {
-        $forcearg = ""
-        if ($forcetag) {
-            $forcearg = "-f"
-        }
+    if (-not ($keepversion -or $notag)) {
+        
         if (-not $test -and -not $dryrun -and $isGit) {
             if ($src -ne ".") { Push-Location $src }
-            git tag $forcearg -a $versionNumber -m "Automated release tag"
+            git tag -a $versionNumber -m "Automated release tag"
             if ($LASTEXITCODE -ne 0) { Exit $LASTEXITCODE }
             if ($src -ne ".") { Pop-Location }
         }

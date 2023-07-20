@@ -20,8 +20,7 @@ Usage:
   -minor        : Increment minor version i.e. x.[x++].0.0
   -patch        : Increment patch version i.e. x.x.[x++].0 (default)
   -hotfix       : Increment hotfix version i.e. x.x.x.[x++]
-  -keepversion  : Keep current version number, doesn't tag unless -forcetag
-  -forcetag     : Move any existing version tag
+  -keepversion  : Keep current version number, doesn't tag
   -notag        : Don't tag even if updating version
   -test         : Testing mode, separate builds, allow dirty working copy
   -browse       : After packaging, browse the output folder
