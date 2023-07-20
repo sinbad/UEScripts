@@ -219,7 +219,7 @@ try {
             Write-Output ""
 
         } else {      
-            Remove-Item -Path $zipdst -Force
+            Remove-Item -Path $zipdst -Force -ErrorAction SilentlyContinue
             $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
             if ($proc.ExitCode -ne 0) {
                 throw "7-Zip failed!"
