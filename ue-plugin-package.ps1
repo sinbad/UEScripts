@@ -143,8 +143,17 @@ try {
         # Bump up version, passthrough options
         try {
             $versionNumber = Get-NextPluginVersion -current:$versionNumber -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix
-            # Save incremented version back to uplugin object (will be saved later)
+            # Save incremented version back to uplugin object
             $proj.VersionName = $versionNumber
+            if (-not $dryrun -and $isGit -and -not $notag) {
+                # Save this now, we need to commit before tagging
+                Write-Output "Incrementing version in .uproject"
+                $newjson = ($proj | ConvertTo-Json -depth 100)
+                $newjson | Out-File $pluginfile
+
+                git add .
+                git commit -m "Version bump" 
+            }
         }
         catch {
             Write-Output $_.Exception.Message
