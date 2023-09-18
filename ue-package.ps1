@@ -5,11 +5,13 @@
 [CmdletBinding()] # Fail on unknown args
 param (
     [string]$src,
+    [string]$out,
     [switch]$major = $false,
     [switch]$minor = $false,
     [switch]$patch = $false,
     [switch]$hotfix = $false,
-    # Don't incrememnt version
+    [switch]$nightly = $false,
+    # Don't increment version
     [switch]$keepversion = $false,
     # Name of variant to build (optional, uses DefaultVariants from packageconfig.json if unspecified)
     [array]$variants,
@@ -33,14 +35,16 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal packaging tool"
     Write-Output "Usage:"
-    Write-Output "  ue-package.ps1 [-src:sourcefolder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
+    Write-Output "  ue-package.ps1 [-src:sourcefolder] [-out:folder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
     Write-Output " "
     Write-Output "  -src          : Source folder (current folder if omitted), must contain packageconfig.json"
+    Write-OUtput "  -out          : Overrides OutputDir in packageconfig.json"
     Write-Output "  -major        : Increment major version i.e. [x++].0.0.0"
     Write-Output "  -minor        : Increment minor version i.e. x.[x++].0.0"
     Write-Output "  -patch        : Increment patch version i.e. x.x.[x++].0 (default)"
     Write-Output "  -hotfix       : Increment hotfix version i.e. x.x.x.[x++]"
     Write-Output "  -keepversion  : Keep current version number, doesn't tag unless -forcetag"
+    Write-Output "  -nightly      : Nightly build, doesn't tag, doesn't commit, re-uses same nightly folder, appends git rev version"
     Write-Output "  -variants Name1,Name2,Name3"
     Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
@@ -144,11 +148,16 @@ try {
 
     $mapsdesc = $maps ? $maps -join ", " : "Default (Project Settings)"
 
+
     Write-Output ""
     Write-Output "Project File    : $projfile"
     Write-Output "UE Version      : $ueVersion"
     Write-Output "UE Install      : $ueinstall"
-    Write-Output "Output Folder   : $($config.OutputDir)"
+    if ($out.Length -eq 0) {
+        Write-Output "Output Folder   : $($config.OutputDir)"
+    } else {
+        Write-Output "Output Folder   : $out"
+    }
     Write-Output "Zipped Folder   : $($config.ZipDir)"
     Write-Output ""
     Write-Output "Chosen Variants : $chosenVariantNames"
@@ -165,7 +174,20 @@ try {
         $patch = $true
     }
     $versionNumber = $null
-    if ($keepversion) {
+    if ($nightly) {
+        $versionNumber = "nightly"
+
+        if ($isGit)
+        {
+            # Add the git ref to the version number in the project ONLY (not our folder)
+            $tempverobj = Get-ProjectVersionComponents $src
+            $gitref = $(git rev-parse --short HEAD)
+            $tempverobj.postfix = "-$gitref"
+            Write-Output "Packaging nightly-$gitref"
+            Write-ProjectVersionFromObject -srcfolder:$src -versionObj:$tempverobj -dryrun:$dryrun
+        }
+
+    } elseif ($keepversion) {
         $versionNumber = Get-Project-Version $src
     } else {
         # Bump up version, passthrough options
@@ -196,7 +218,7 @@ try {
 
     # For tagging release
     # We only need to grab the main version once
-    if (-not $keepversion) {
+    if (-not $keepversion -and -not $nightly) {
 
         if (-not $test -and -not $dryrun -and $isGit) {
             if ($src -ne ".") { Push-Location $src }
@@ -213,7 +235,11 @@ try {
 
     foreach ($var in $chosenVariants) {
 
-        $outDir = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$var.Name
+        if ($out.Length -gt 0) {
+            $outDir = Join-Path $out "$($var.Name)-$($versionNumber)"
+        } else {
+            $outDir = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$var.Name
+        }
 
         # Delete previous
         Remove-Item -Path $outDir -Recurse -Force -ErrorAction SilentlyContinue
@@ -346,4 +372,6 @@ catch {
     Exit 9
 }
 
+# Revert any remaining temp changes
+git checkout .
 Write-Output "~-~-~ Unreal Packaging Helper Completed OK ~-~-~"
