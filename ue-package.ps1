@@ -216,7 +216,7 @@ try {
         $outDir = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$var.Name
 
         # Delete previous
-        Remove-Item -Path $outDir -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $outDir -Recurse -Force -ErrorAction SilentlyContinue
 
         $argList = [System.Collections.ArrayList]@()
         $argList.Add("-ScriptsForProject=`"$projfile`"") > $null
