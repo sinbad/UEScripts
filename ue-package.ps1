@@ -239,10 +239,6 @@ try {
             $argList.Add("-pak") > $null
         }
         $argList.Add("-prereqs") > $null
-        if ($var.Configuration -eq "Shipping")
-        {
-            $argList.Add("-nodebuginfo") > $null
-        }
         $argList.Add("-build") > $null
         $argList.Add("-target=$($config.Target)") > $null
         $argList.Add("-clientconfig=$($var.Configuration)") > $null
@@ -290,6 +286,26 @@ try {
             }
             
         }
+
+        if ($var.Configuration -eq "Shipping")
+        {
+            # For shipping, move the PDBs aside but keep them for later use
+            $outDirPDB = "$($outDir)-ShippingPDB"
+            Remove-Item -Path $outDirPDB -Force -ErrorAction SilentlyContinue
+            New-Item -ItemType Directory $outDirPDB -Force > $null
+
+            $pdbs = @(Get-ChildItem -Path $outDir -Filter *.pdb -Recurse -ErrorAction SilentlyContinue -Force)
+            # Need to be in dir to calculate relative
+            Push-Location $outDir 
+            $pdbs | ForEach-Object {
+                $pdbdir = Join-Path $outDirPDB $($_.DirectoryName | Resolve-Path -Relative)
+                New-Item -ItemType Directory $pdbdir -Force > $null
+                $pdbdest = Join-Path $outDirPDB $($_.FullName | Resolve-Path -Relative)
+                Move-Item $_.FullName $pdbdest -Force
+            }
+            Pop-Location
+        }
+
 
         if ($var.Zip) {
             if ($dryrun) {
