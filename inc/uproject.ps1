@@ -66,6 +66,8 @@ function Get-UE-Version {
         $buildverfile = Join-Path $srcdir "Engine/Build/Build.version"
         $buildjson = (Get-Content $buildverfile) | ConvertFrom-Json
         return "$($buildjson.MajorVersion).$($buildjson.MinorVersion)"
+    } else {
+        return $assoc
     }
 }
 
