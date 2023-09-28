@@ -52,10 +52,20 @@ function Get-UE-Version {
     )
 
     if ($uproject.EngineAssociation) {
-        return $uproject.EngineAssociation
+        $assoc = $uproject.EngineAssociation
     } else {
         # Plugin
-        return $uproject.EngineVersion
+        $assoc = $uproject.EngineVersion
+    }
+
+    # If this is a GUID "{A1234786-..}" then it's a source build, we need to resolve it via registry
+    if ($assoc.StartsWith("{")) {
+        # Look up the source dir from registry setting
+        $srcdir = Get-ItemPropertyValue 'Registry::HKEY_CURRENT_USER\Software\Epic Games\Unreal Engine\Builds' -Name $assoc
+        # In source build, read Build.version JSON
+        $buildverfile = Join-Path $srcdir "Engine/Build/Build.version"
+        $buildjson = (Get-Content $buildverfile) | ConvertFrom-Json
+        return "$($buildjson.MajorVersion).$($buildjson.MinorVersion)"
     }
 }
 
