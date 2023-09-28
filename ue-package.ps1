@@ -233,7 +233,7 @@ try {
     # to run the "Cook" stage. If we don't do this, then any source plugins will
     # be missing in a clean checkout build and the cook stage will fail
     Write-Output "Building Editor (for Cooking)"
-    ue-build.ps1 -mode:dev -src:$src -nocloseeditor -dryrun:$dryrun
+    .\ue-build.ps1 -mode:dev -src:$src -nocloseeditor -dryrun:$dryrun
 
     $ueEditorCmd = Get-UEEditorCmd $ueVersion $ueinstall
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
