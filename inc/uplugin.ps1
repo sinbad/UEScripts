@@ -42,5 +42,7 @@ function Update-UpluginUeVersion {
     $plugincontents = (Get-Content $pluginfile) | ConvertFrom-Json
     $proj.EngineVersion = $version
     $newjson = ($plugincontents | ConvertTo-Json -depth 100)
-    $newjson | Out-File $pluginfile
+    # Need to explicitly set to UTF8, Out-File now converts to UTF16-LE??
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllLines($pluginfile, $newjson, $Utf8NoBomEncoding)
 }

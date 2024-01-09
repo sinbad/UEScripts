@@ -114,6 +114,8 @@ if (-not $test -and $isGit) {
 try {
     # Import config & project settings
     $config = Read-Plugin-Config -srcfolder:$src
+    # Need to explicitly set to UTF8, Out-File now converts to UTF16-LE??
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
     $pluginfile = Get-Uplugin-Filename -srcfolder:$src -config:$config
     if (-not $pluginfile) {
@@ -149,7 +151,7 @@ try {
                 # Save this now, we need to commit before tagging
                 Write-Output "Incrementing version in .uproject"
                 $newjson = ($proj | ConvertTo-Json -depth 100)
-                $newjson | Out-File $pluginfile
+                [System.IO.File]::WriteAllLines($pluginfile, $newjson, $Utf8NoBomEncoding)
 
                 git add .
                 git commit -m "Version bump" 
@@ -191,7 +193,8 @@ try {
         $newjson = ($proj | ConvertTo-Json -depth 100)
         if (-not $dryrun) {
             Write-Output "Writing updates to .uproject"
-            $newjson | Out-File $pluginfile
+            [System.IO.File]::WriteAllLines($pluginfile, $newjson, $Utf8NoBomEncoding)
+
         }
 
         # Zip parent of the uplugin folder
@@ -249,7 +252,7 @@ try {
     if (-not $dryrun) {
         $newjson = ($proj | ConvertTo-Json -depth 100)
         Write-Output "Resetting .uproject"
-        $newjson | Out-File $pluginfile
+        [System.IO.File]::WriteAllLines($pluginfile, $newjson, $Utf8NoBomEncoding)
     }
 
 
