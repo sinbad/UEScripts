@@ -13,9 +13,9 @@ param (
 . $PSScriptRoot\inc\filetools.ps1
 
 function Print-Usage {
-    Write-Output "Steve's Unreal Build Tool"
+    Write-Output "Steve's Unreal Cook Tool"
     Write-Output "Usage:"
-    Write-Output "  ue-build.ps1 [[-mode:]<dev|test|prod>] [[-src:]sourcefolder] [Options]"
+    Write-Output "  ue-cook.ps1 [[-src:]sourcefolder] [Options]"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
@@ -100,7 +100,7 @@ try {
         $uinstall = Join-Path $uroot "UE_$uversion"
     }
 
-    # Test we can find Build.bat
+    # Test we can find RunUAT
     $ueEditorCmd = Get-UEEditorCmd $uversion $uinstall
     $runUAT = Join-Path $uinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
 
