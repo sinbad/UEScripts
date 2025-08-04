@@ -6,6 +6,7 @@ param (
     [switch]$allversions = $false,
     [string]$uever = "",
     [switch]$nocloseeditor = $false,
+    [switch]$zip = $false,
     [switch]$dryrun = $false,
     [switch]$help = $false
 )
@@ -28,6 +29,7 @@ function Print-Usage {
     Write-Output "  -allversions  : Build for all supported UE versions, not just the current one"
     Write-Output "                : (specified in pluginconfig.json, only works with lancher-installed UE)"
     Write-Output "  -uever:5.x.x  : Build for a specific UE version, not the current one (launcher only)"
+    Write-Output "  -zip          : Zip up the built plugin for distribution "
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
     Write-Output " "
@@ -69,6 +71,7 @@ try {
     }
 
     $proj = Read-Uproject $pluginfile
+    $pluginName = (Get-Item $pluginfile).Basename
     $origUeVersion = Get-UE-Version $proj
     if ($allversions) {
         $ueVersions = $config.EngineVersions
@@ -93,7 +96,7 @@ try {
 
         Write-Output "Building for UE Version $ver"
         $ueinstall = Get-UE-Install $ver
-        $outputDir = Join-Path $config.BuildDir $ver
+        $outputDir = Join-Path $config.BuildDir $ver $pluginName
 
         # Need to change the version in the plugin while we build
         if (-not $dryrun -and ($allversions -or $ueVer.Length -gt 0)) {
@@ -123,11 +126,41 @@ try {
             $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
             if ($proc.ExitCode -ne 0) {
                 # Reset the plugin back to the original UE version
-                if ($allversions -and -not $dryrun) {
+                if (($allversions -or $uever) -and -not $dryrun) {
                     Update-UpluginUeVersion $src $config $origUeVersion
                 }
 
                 throw "RunUAT failed!"
+            }
+        }
+
+        if ($zip) {
+
+            $zipsrc = $outputDir
+            $zipdst = Join-Path $config.BuildDir "$($pluginName)_UE$($ver).zip"
+
+            $argList = [System.Collections.ArrayList]@()
+            $argList.Add("a") > $null
+            $argList.Add($zipdst) > $null
+            # Exclude Intermediate, everything else is clean
+            $argList.Add("-x!$pluginName\Intermediate\") > $null
+
+            $argList.Add($zipsrc) > $null
+
+            if ($dryrun) {
+                Write-Output ""
+                Write-Output "Would have run:"
+                Write-Output "> 7z.exe $($argList -join " ")"
+                Write-Output ""
+
+            } else {      
+                Write-Output "Compressing to $zipdst"
+                Remove-Item -Path $zipdst -Force -ErrorAction SilentlyContinue
+                $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
+                if ($proc.ExitCode -ne 0) {
+                    throw "7-Zip failed!"
+                }
+
             }
         }
     }
