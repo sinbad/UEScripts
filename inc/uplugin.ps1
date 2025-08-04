@@ -34,13 +34,26 @@ function Get-Uplugin-Filename {
 }
 
 function Update-UpluginUeVersion {
-    [string]$srcfolder,
-    [PluginConfig]$config,
-    [string]$version
+    param (
+        [string]$srcfolder,
+        [PluginConfig]$config,
+        [string]$version
+    )
 
     $pluginfile = Get-Uplugin-Filename $srcfolder $config
     $plugincontents = (Get-Content $pluginfile) | ConvertFrom-Json
-    $proj.EngineVersion = $version
+
+    if ($version) {
+        # May need to add the member
+        if ($pluginContents.PSobject.Properties.name -match "EngineVersion") {
+            $plugincontents.EngineVersion = $version
+        } else {
+            $plugincontents | Add-Member -NotePropertyName EngineVersion -NotePropertyValue $version
+        }
+    } else {
+        # Need to remove the EngineVersion assignment
+        $plugincontents = ($plugincontents | Select-Object * -ExcludeProperty EngineVersion)
+    }
     $newjson = ($plugincontents | ConvertTo-Json -depth 100)
     # Need to explicitly set to UTF8, Out-File now converts to UTF16-LE??
     $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False

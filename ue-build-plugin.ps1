@@ -78,6 +78,10 @@ try {
         $ueVersions = @($origUeVersion)
     }
 
+    if (-not $ueVersions) {
+        throw "No UE version specified and plugin is not associated with a version."
+    }
+
     
     Write-Output ""
     Write-Output "Project File    : $pluginfile"
