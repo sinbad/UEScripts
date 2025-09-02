@@ -231,7 +231,7 @@ try {
             # In push mode, we only upload our builtdata if there is no existing
             # entry for that OID by default (safest). Or, if forced to do so
             if (-not (Test-Path $localbuiltdata -PathType Leaf)) {
-                Write-Warning "Skipping $filename, local file missing"
+                Write-Verbose "Skipping $filename, local file missing"
                 continue
             }
 
@@ -287,7 +287,7 @@ try {
                     }
             
                 } else {
-                    Write-Warning "Skipping $filename, remote file missing"
+                    Write-Verbose "Skipping $filename, remote file missing"
                     continue
                 }
             }
