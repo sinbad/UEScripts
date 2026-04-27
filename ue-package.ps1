@@ -177,15 +177,20 @@ try {
     if ($nightly) {
         $versionNumber = "nightly"
 
+        $tempverobj = Get-ProjectVersionComponents $src
+        $builddate = Get-Date -Format "yyyyMMdd"
         if ($isGit)
         {
             # Add the git ref to the version number in the project ONLY (not our folder)
-            $tempverobj = Get-ProjectVersionComponents $src
             $gitref = $(git rev-parse --short HEAD)
-            $tempverobj.postfix = "-$gitref"
-            Write-Output "Packaging nightly-$gitref"
-            Write-ProjectVersionFromObject -srcfolder:$src -versionObj:$tempverobj -dryrun:$dryrun
+            $tempverobj.postfix = "-$gitref-$builddate"
         }
+        else
+        {
+            $tempverobj.postfix = "-$builddate"
+        }
+        Write-Output "Packaging $versionNumber-${tempverobj.postfix}"
+        Write-ProjectVersionFromObject -srcfolder:$src -versionObj:$tempverobj -dryrun:$dryrun
 
     } elseif ($keepversion) {
         $versionNumber = Get-Project-Version $src
