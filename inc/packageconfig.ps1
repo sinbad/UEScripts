@@ -59,6 +59,8 @@ class PackageConfig {
     # Folder to place zipped releases (named $target_$platform_$variant_$version.zip)
     # If relative, will be considered relative to source folder
     [string]$ZipDir
+    # Folder to place files used to build a bundled PSO cache
+    [string]$PSOCacheDir
     # Optional project file name (relative or absolute). If missing will detect .uproject in source folder
     [string]$ProjectFile
     # Target name: this will usually be the name of your game

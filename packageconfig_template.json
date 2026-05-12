@@ -1,6 +1,7 @@
 {
     "OutputDir": "/Path/To/Output/Parent/Dir",
     "ZipDir": "/Optional/Path/To/Zipped/Releases/Folder",
+    "PSOCacheDir": "/Path/To/PSO/Dir",
 
     "ProjectFile": "OptionalProjectFilenameWillDetectInDirOtherwise.uproject",
 
@@ -24,14 +25,14 @@
     "Variants": [
         {
             "Name": "PrivateWin64Build", 
-            "Platform": "Win64",
+            "Platform": "Windows",
             "Configuration": "Development",
             "Zip": true,
             "ExtraBuildArguments": "-Any -Custom -Args=ToRunUAT -OrOtherCommandlets"
         },
         {
             "Name": "PublicWin64SteamBuild", 
-            "Platform": "Win64",
+            "Platform": "Windows",
             "Configuration": "Shipping",
             "ReleaseTo": [
                 "Steam"
@@ -49,7 +50,7 @@
         },
         {
             "Name": "PublicWin64Build", 
-            "Platform": "Win64",
+            "Platform": "Windows",
             "Configuration": "Shipping",
             "ReleaseTo": [
                 "Itch",
