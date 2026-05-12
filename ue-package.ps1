@@ -37,7 +37,7 @@ param (
 function Write-Usage {
     Write-Output "Steve's Unreal packaging tool"
     Write-Output "Usage:"
-    Write-Output "  ue-package.ps1 [-src:sourcefolder] [-out:folder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variant=VariantName] [-test] [-dryrun]"
+    Write-Output "  ue-package.ps1 [-src:sourcefolder] [-out:folder] [-major|-minor|-patch|-hotfix] [-keepversion] [-force] [-variants=VariantName] [-test] [-dryrun]"
     Write-Output " "
     Write-Output "  -src          : Source folder (current folder if omitted), must contain packageconfig.json"
     Write-OUtput "  -out          : Overrides OutputDir in packageconfig.json"
