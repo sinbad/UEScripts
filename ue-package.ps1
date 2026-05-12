@@ -19,6 +19,8 @@ param (
     [switch]$test = $false,
     # Browse the output directory in file explorer after packaging
     [switch]$browse = $false,
+    # Skip zipping the packaged output
+    [switch]$skipzip = $false,
     # Dry-run; does nothing but report what *would* have happened
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -49,6 +51,7 @@ function Write-Usage {
     Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -test         : Testing mode, separate builds, allow dirty working copy"
     Write-Output "  -browse       : After packaging, browse the output folder"
+    Write-Output "  -skipzip      : Don't zip any results regardless of the usual variant config"
     Write-Output "  -dryrun       : Don't perform any actual actions, just report on what you would do"
     Write-Output "  -help         : Print this help"
     Write-Output " "
@@ -158,7 +161,9 @@ try {
     } else {
         Write-Output "Output Folder   : $out"
     }
-    Write-Output "Zipped Folder   : $($config.ZipDir)"
+    if (-not $skipzip) {
+        Write-Output "Zipped Folder   : $($config.ZipDir)"
+    }
     Write-Output ""
     Write-Output "Chosen Variants : $chosenVariantNames"
     Write-Output "Maps to Cook    : $mapsdesc"
@@ -349,7 +354,7 @@ try {
         }
 
 
-        if ($var.Zip) {
+        if ($var.Zip -and -not $skipzip) {
             if ($dryrun) {
                 Write-Output "Would have compressed $outdir to $(Join-Path $config.ZipDir "$($config.Target)_$($versionNumber)_$($var.Name).zip")"
             } else {
