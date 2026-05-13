@@ -8,7 +8,7 @@ are used in a game session, and then telling the engine about them at startup so
 immediately, and not do it on demand with all the stuttering that results in.
 
 > Note: Currently only DirectX 12 is supported. Patches welcome for Vulkan/Metal, it's probably just some file name changes
-> but I'm not testing with those environments yet.
+> but I'm not testing with those environments yet. DirectX 11 doesn't have PSOs so doesn't need this (it does get stutters, but less so than Dx12)
 
 This script uses the `PSOCacheDir` option in `packageconfig.json`, please see the [Package Config File docs](PackageConfig.md)
 for a full description of this file.
