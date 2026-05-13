@@ -56,3 +56,10 @@ and start from scratch.
 You might want to commit `Build/Platform/PipelineCaches/*.spc` to source control, so that your build process can pick
 them up, they're actually not that large.
 
+## Testing the result
+
+To test that this has done what you hope:
+
+1. [Package the game](Package.md) again
+2. Launch the game with the `-clearPSODriverCache` option to force all PSOs to be rebuilt
+3. Use `FShaderPipelineCache::NumPrecompilesRemaining()` to know when shader precompilation is done
