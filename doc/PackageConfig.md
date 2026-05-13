@@ -13,6 +13,7 @@ in detail later in this document, but but here's an example demonstrating many o
 {
     "OutputDir": "C:\\Users\\Steve\\Projects\\Builds\\Game1",
     "ZipDir": "C:\\Users\\Steve\\Projects\\Archives",
+    "PSOCacheDir": "C:\\Users\\Steve\\Projects\\PSOCache",
 
     "Target": "Game1",
     "CookAllMaps": true,    
@@ -142,6 +143,12 @@ If true, combine packaged files into a .pak file.
 
 For variants which enable the [`Zip`](#zip) option, this is the directory that
 zipped packages will be created in.
+
+### `PSOCacheDir`
+*Optional Setting - string* 
+
+If you want to use the PSO cache tool, you need to tell it where to put the data files generataed from this process.
+This can be a shared directory, sub directories will be created per project.
 
 ### `ProjectFile`
 *Optional Setting - string* 

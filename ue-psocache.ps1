@@ -81,9 +81,6 @@ try {
     {
         throw "PSOCacheDir is empty in config, aborting"
     }
-    if (-not $Dryrun) {
-        New-Item -ItemType Directory $config.PSOCacheDir -Force > $null
-    }
 
 
     Write-Output ""
@@ -113,10 +110,16 @@ try {
         Write-Warning "Unknown variant(s) ignored: $($unmatchedVariants -join ", ")"
     }
 
+    # Make a project-specific subdir of PSO cache dir (could be shared)
+    $projPSOcache = Join-Path $config.PSOCacheDir $projname
+    if (-not $Dryrun) {
+        New-Item -ItemType Directory $projPSOcache -Force > $null
+    }
+
     if ($clean -and -not $dryrun) {
         # Delete everything in the PSO cache area
-        Remove-Item "$($config.PSOCacheDir)\*.rec.upipelinecache" -Force
-        Remove-Item "$($config.PSOCacheDir)\*.shk" -Force
+        Remove-Item "$projPSOcache\*.rec.upipelinecache" -Force
+        Remove-Item "$projPSOcache\*.shk" -Force
 
         # Also delete our existing .spc files
         Remove-Item "Build\*\PipelineCaches\*.spc" -Force
@@ -149,10 +152,10 @@ try {
             $shksrc = Join-Path $src "Saved" "Cooked" "Windows" $projname "Metadata" "PipelineCaches"
                 if ($dryrun) {
                 Write-Output ""
-                Write-Output "Would have copied ${shksrc}/*.shk to $($config.PSOCacheDir)"
+                Write-Output "Would have copied ${shksrc}/*.shk to $projPSOcache"
                 Write-Output ""
             } else {
-                Get-ChildItem -Path $shksrc -Filter *.shk | Copy-Item -Destination $config.PSOCacheDir
+                Get-ChildItem -Path $shksrc -Filter *.shk | Copy-Item -Destination $projPSOcache
             }
 
 
@@ -187,10 +190,10 @@ try {
 
             if ($dryrun) {
                 Write-Output ""
-                Write-Output "Would have copied ${recsrc}/*.rec.upipelinecache to $($config.PSOCacheDir)"
+                Write-Output "Would have copied ${recsrc}/*.rec.upipelinecache to $projPSOcache"
                 Write-Output ""
             } else {
-                Get-ChildItem -Path $recsrc -Filter *.rec.upipelinecache | Copy-Item -Destination $config.PSOCacheDir
+                Get-ChildItem -Path $recsrc -Filter *.rec.upipelinecache | Copy-Item -Destination $projPSOcache
             }
 
             # Use the ShaderPipelineCacheTools to generate .spc files
@@ -201,9 +204,9 @@ try {
             $argList.Add("-run=ShaderPipelineCacheTools") > $null
             $argList.Add("expand") > $null
             # Input Recorded Sm6 upipelinecache
-            $argList.Add("$($config.PSOCacheDir)/*PCD3D_SM6*.rec.upipelinecache") > $null
+            $argList.Add("$projPSOcache/*PCD3D_SM6*.rec.upipelinecache") > $null
             # Input Shader keys for SM6
-            $argList.Add("$($config.PSOCacheDir)/*PCD3D_SM6.shk") > $null
+            $argList.Add("$projPSOcache/*PCD3D_SM6.shk") > $null
             # Output .spc file - must be tagged with version ID as prefix, and ProjectName_PCD3D_SM6 pattern is v important
             $argList.Add("$src/Build/Windows/PipelineCaches/$($buildID)_$($projname)_PCD3D_SM6.spc") > $null
 
@@ -234,11 +237,10 @@ catch {
     Exit 9
 }
 
-if (-not $test -and $isGit) {
-    # Revert any remaining temp changes
-    git checkout .
+
+if (-not $dryrun) {
+    Write-Output ""
+    Write-Output "Your next package build will include the newly created bundled PSOs!"
+    Write-Output ""
 }
-Write-Output ""
-Write-Output "Your next package build will include the newly created bundled PSOs!"
-Write-Output ""
 Write-Output "~-~-~ Unreal PSO Cache Helper Completed OK ~-~-~"
