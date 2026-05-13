@@ -12,6 +12,7 @@ These scripts support **UE4 and UE5** and will detect which one your project is 
 * [Managing Git LFS Locking Tasks](https://github.com/sinbad/GitScripts): push and unlock, release locks you don't need any more
 * [Packaging a Game](./doc/Package.md): building, cooking, archiving
 * [Releasing a Game](./doc/Release.md): e.g. uploading to Itch, Steam
+* [Building a bundled PSO cache](./doc/BundledPSO.md): to fix shader stutters
 * [Rebuilding Lightmaps](./doc/RebuildLightmaps.md): build lighting on the command line easily (supporting git-lfs locking, no P4 dependency like RunUAT)
 * [Getting Latest for Artists](./doc/GetLatest.md): pulls from git and builds so C++ changes are automatically updated
 * [Synchronising BuiltData Files outside of Git](./doc/DataSync.md)

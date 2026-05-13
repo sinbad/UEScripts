@@ -18,7 +18,7 @@ param (
 function Print-Usage {
     Write-Output "Steve's Unreal PSO Cache Tool"
     Write-Output "Usage:"
-    Write-Output "  ue-psocache.ps1 [[-src:]sourcefolder] [Options] -out:PackageDir"
+    Write-Output "  ue-psobundle.ps1 [[-src:]sourcefolder] [Options] -out:PackageDir"
     Write-Output " "
     Write-Output "  -src         : Source folder (current folder if omitted)"
     Write-Output "               : (should be root of project)"
