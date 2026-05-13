@@ -43,7 +43,15 @@ Environment Variables:
 
 In stage 3 you should run around in your game trying to see as much as you can, so the PSOs in use get recorded. Some
 people make a "zoo" level with everything in it to make this easier, but since the process is cumulative you can just
-do bits at a time if you want.
+do bits at a time if you want. You should also switch to different quality levels to ensure that all permutations of
+your shaders are used.
+
+> If you want to detect whether your game is being run with PSO recording enabled, you can check this in C++:
+> ```c++
+> bool bIsRecordingPSOs = FParse::Param(FCommandLine::Get(), TEXT("logpso"));`
+> ```
+> You could use this to automate the recording process more such as automatically opening a zoo level and playing a 
+> level sequence which pans around it all.
 
 The end result is `.spc` files in your project Build/Platform/PipelineCaches folder, which on next
 cook/package will include that list of PSOs/shaders in your next game build, and you can use `FShaderPipelineCache::NumPrecompilesRemaining()`
