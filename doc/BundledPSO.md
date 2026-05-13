@@ -41,6 +41,9 @@ Environment Variables:
 3. Runs your game with the `-logPSO` option to record PSOs being built (shaders being compiled)
 4. Collects all that data and packs it into `.spc` files in yor project build dir for use in the next package created
 
+In stage 3 you should run around in your game trying to see as much as you can, so the PSOs in use get recorded. Some
+people make a "zoo" level with everything in it to make this easier, but since the process is cumulative you can just
+do bits at a time if you want.
 
 The end result is `.spc` files in your project Build/Platform/PipelineCaches folder, which on next
 cook/package will include that list of PSOs/shaders in your next game build, and you can use `FShaderPipelineCache::NumPrecompilesRemaining()`
