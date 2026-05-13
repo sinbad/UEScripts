@@ -2,9 +2,8 @@
 param (
     [string]$src,
     [string]$out,
-    [switch]$record = $false,
-    [switch]$collect = $false,
     [switch]$clean = $false,
+    [switch]$d3d11 = $false,
     [switch]$nocloseeditor = $false,
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -26,6 +25,7 @@ function Print-Usage {
     Write-Output "               : (should be root of project)"
     Write-Output "  -out         : Required param, where to put the packaged build we use"
     Write-Output "  -clean       : Delete all data and gather PSOs from scratch instead of incremental"
+    Write-Output "  -d3d11       : On Windows targets, record D3D11/SM5 instead of D3D12/SM6"
     Write-Output "  -variants Name1,Name2,Name3"
     Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -nocloseeditor : Don't close Unreal editor (this will prevent DLL cleanup)"
@@ -76,6 +76,7 @@ try {
     $ueVersion = Get-UE-Version $proj
     $ueinstall = Get-UE-Install $ueVersion
     $projname = [System.IO.Path]::GetFileNameWithoutExtension($projfile)
+    $projdir = [System.IO.Path]::GetDirectoryName($projfile)
 
     if ($config.PSOCacheDir.Length -eq 0)
     {
@@ -147,26 +148,36 @@ try {
 
             # -------------  RECORD --------------------------   
 
+            # It's important that we process SM5 and SM6 files separately, hence the specific matching
+            $shadermodel = "SM6"
+            if ($d3d11) {
+                $shadermodel = "SM5"
+            }
+
             # Copy out the .shk files that were generated
             # e.g. Saved\Cooked\Windows\ProjectName\Metadata\PipelineCaches
             $shksrc = Join-Path $src "Saved" "Cooked" "Windows" $projname "Metadata" "PipelineCaches"
                 if ($dryrun) {
                 Write-Output ""
-                Write-Output "Would have copied ${shksrc}/*.shk to $projPSOcache"
+                Write-Output "Would have copied ${shksrc}/*PCD3D_$($shadermodel)*.shk to $projPSOcache"
                 Write-Output ""
             } else {
-                Get-ChildItem -Path $shksrc -Filter *.shk | Copy-Item -Destination $projPSOcache
+                Get-ChildItem -Path $shksrc -Filter "*PCD3D_$($shadermodel)*.shk" | Copy-Item -Destination $projPSOcache
             }
 
 
             $gamerootdir = Join-Path $out "$($var.Name)-nightly-test" "Windows"
             $game =  Join-Path $gamerootdir "${projname}.exe"
 
+            # Run default
             $argList = [System.Collections.ArrayList]@()
             # record PSOs
             $argList.Add("-logPSO") > $null
             # discard all previously compiled shaders so we record everything
             $argList.Add("-clearPSODriverCache") > $null
+            if ($d3d11) {
+                $argList.Add("-d3d11") > $null
+            }
 
             if ($dryrun) {
                 Write-Output ""
@@ -175,13 +186,15 @@ try {
                 Write-Output ""
 
             } else {            
+                Write-Output "~-~-~ Launching Game To Record PSO Usage ~-~-~"
+
                 $proc = Start-Process $game $argList -Wait -PassThru -NoNewWindow
                 if ($proc.ExitCode -ne 0) {
                     throw "Running game failed!"
                 }
+                Write-Output "~-~-~ Game exited, processing PSO Data ~-~-~"
 
             }
-
 
             # -------------  COLLECT  --------------------------   
 
@@ -190,25 +203,24 @@ try {
 
             if ($dryrun) {
                 Write-Output ""
-                Write-Output "Would have copied ${recsrc}/*.rec.upipelinecache to $projPSOcache"
+                Write-Output "Would have copied ${recsrc}/*PCD3D_$($shadermodel)*.rec.upipelinecache to $projPSOcache"
                 Write-Output ""
             } else {
-                Get-ChildItem -Path $recsrc -Filter *.rec.upipelinecache | Copy-Item -Destination $projPSOcache
+                Get-ChildItem -Path $recsrc -Filter "*PCD3D_$($shadermodel)*.rec.upipelinecache" | Copy-Item -Destination $projPSOcache
             }
 
             # Use the ShaderPipelineCacheTools to generate .spc files
-            # It's important that we do the SM5 and SM6 paths separately
-            # TODO: Optionally do SM5 path
+
             $uecmd = Join-Path $ueinstall "Engine/Binaries/Win64/UnrealEditor-Cmd$exeSuffix"
             $argList = [System.Collections.ArrayList]@()
             $argList.Add("-run=ShaderPipelineCacheTools") > $null
             $argList.Add("expand") > $null
-            # Input Recorded Sm6 upipelinecache
-            $argList.Add("$projPSOcache/*PCD3D_SM6*.rec.upipelinecache") > $null
-            # Input Shader keys for SM6
-            $argList.Add("$projPSOcache/*PCD3D_SM6.shk") > $null
+            # Input Recorded upipelinecache
+            $argList.Add("$projPSOcache/*PCD3D_$($shadermodel)*.rec.upipelinecache") > $null
+            # Input Shader keys for
+            $argList.Add("$projPSOcache/*PCD3D_$($shadermodel).shk") > $null
             # Output .spc file - must be tagged with version ID as prefix, and ProjectName_PCD3D_SM6 pattern is v important
-            $argList.Add("$src/Build/Windows/PipelineCaches/$($buildID)_$($projname)_PCD3D_SM6.spc") > $null
+            $argList.Add("$projdir/Build/Windows/PipelineCaches/$($buildID)_$($projname)_PCD3D_$($shadermodel).spc") > $null
 
             if ($dryrun) {
                 Write-Output ""
@@ -216,7 +228,9 @@ try {
                 Write-Output "> $uecmd $($argList -join " ")"
                 Write-Output ""
 
-            } else {            
+            } else {
+                Write-Output "~-~-~ Expanding PSO Data, creating SPC file (bundled PSOs) ~-~-~"
+
                 $proc = Start-Process $uecmd $argList -Wait -PassThru -NoNewWindow
                 if ($proc.ExitCode -ne 0) {
                     throw "Creating .spc file failed!"
