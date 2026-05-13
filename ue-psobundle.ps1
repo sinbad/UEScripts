@@ -3,7 +3,6 @@ param (
     [string]$src,
     [string]$out,
     [switch]$clean = $false,
-    [switch]$d3d11 = $false,
     [switch]$nocloseeditor = $false,
     [switch]$dryrun = $false,
     [switch]$help = $false
@@ -25,7 +24,6 @@ function Print-Usage {
     Write-Output "               : (should be root of project)"
     Write-Output "  -out         : Required param, where to put the packaged build we use"
     Write-Output "  -clean       : Delete all data and gather PSOs from scratch instead of incremental"
-    Write-Output "  -d3d11       : On Windows targets, record D3D11/SM5 instead of D3D12/SM6"
     Write-Output "  -variants Name1,Name2,Name3"
     Write-Output "                : Build only named variants instead of DefaultVariants from packageconfig.json"
     Write-Output "  -nocloseeditor : Don't close Unreal editor (this will prevent DLL cleanup)"
@@ -149,10 +147,9 @@ try {
             # -------------  RECORD --------------------------   
 
             # It's important that we process SM5 and SM6 files separately, hence the specific matching
+            # However even though there are SM5 .shk files created, it seems pointless as there are no PSOs to log
+            # If you try it, no rec.pipelinecache files are created
             $shadermodel = "SM6"
-            if ($d3d11) {
-                $shadermodel = "SM5"
-            }
 
             # Copy out the .shk files that were generated
             # e.g. Saved\Cooked\Windows\ProjectName\Metadata\PipelineCaches
@@ -175,9 +172,6 @@ try {
             $argList.Add("-logPSO") > $null
             # discard all previously compiled shaders so we record everything
             $argList.Add("-clearPSODriverCache") > $null
-            if ($d3d11) {
-                $argList.Add("-d3d11") > $null
-            }
 
             if ($dryrun) {
                 Write-Output ""
@@ -186,13 +180,17 @@ try {
                 Write-Output ""
 
             } else {            
+                Write-Output ""
                 Write-Output "~-~-~ Launching Game To Record PSO Usage ~-~-~"
+                Write-Output ""
 
                 $proc = Start-Process $game $argList -Wait -PassThru -NoNewWindow
                 if ($proc.ExitCode -ne 0) {
                     throw "Running game failed!"
                 }
+                Write-Output ""
                 Write-Output "~-~-~ Game exited, processing PSO Data ~-~-~"
+                Write-Output ""
 
             }
 
@@ -229,7 +227,9 @@ try {
                 Write-Output ""
 
             } else {
+                Write-Output ""
                 Write-Output "~-~-~ Expanding PSO Data, creating SPC file (bundled PSOs) ~-~-~"
+                Write-Output ""
 
                 $proc = Start-Process $uecmd $argList -Wait -PassThru -NoNewWindow
                 if ($proc.ExitCode -ne 0) {
@@ -246,6 +246,7 @@ try {
 
 }
 catch {
+    Write-Output ""
     Write-Output $_.Exception.Message
     Write-Output "~-~-~ Unreal PSO Cache Helper FAILED ~-~-~"
     Exit 9
