@@ -45,6 +45,7 @@ function Read-Uproject {
 
 }
 
+# Get the engine association, which might be an alias to a build
 function Get-UE-Version {
     param (
         # the uproject object from Read-Uproject
@@ -58,17 +59,19 @@ function Get-UE-Version {
         $assoc = $uproject.EngineVersion
     }
 
-    # If this is a GUID "{A1234786-..}" then it's a source build, we need to resolve it via registry
-    if ($assoc -and $assoc.StartsWith("{")) {
-        # Look up the source dir from registry setting
-        $srcdir = Get-ItemPropertyValue 'Registry::HKEY_CURRENT_USER\Software\Epic Games\Unreal Engine\Builds' -Name $assoc
-        # In source build, read Build.version JSON
-        $buildverfile = Join-Path $srcdir "Engine/Build/Build.version"
-        $buildjson = (Get-Content $buildverfile) | ConvertFrom-Json
-        return "$($buildjson.MajorVersion).$($buildjson.MinorVersion)"
-    } else {
-        return $assoc
-    }
+    return $assoc
+}
+
+function Is-Standard-UE-Version {
+    param (
+        # the engine association which might be a build name not a standard version
+        [psobject]$ueVersionName
+    )
+
+    # If this is NOT a standard installed UE version (5.x[.x]), it's a custom build dir, source or binary
+    # We need to resolve it via registry on Windows
+    # It *might* be a GUID "{A1234786-..}" but it also might be a custom name
+    return $ueVersionName -match "^[45]\.\d+(\.\d+)?$"
 }
 
 function Get-Is-UE5 {
@@ -77,7 +80,8 @@ function Get-Is-UE5 {
         [string]$ueVersion
     )
 
-    return $ueVersion.StartsWith("5.")
+    # Assume that a custom build tag that doesn't start with 5.x is UE5
+    return !$ueVersion.StartsWith("4.")
 }
 
 function Get-UE-Install {
@@ -105,13 +109,23 @@ function Get-UE-Install {
             $uroot = "C:\Program Files\Epic Games"
         } 
 
-        # When using $ueVersion, strip off 3rd digit if any
-        $regex = "(\d+\.\d+)(\.\d+)?"
-        $match = $ueVersion | Select-String -Pattern $regex
+        $isStandardUE = Is-Standard-UE-Version $ueVersion
 
-        $ueVersionTrimmed = $match.Matches[0].Groups[1].Value
-        
-        $uinstall = Join-Path $uroot "UE_$ueVersionTrimmed"
+        if ($isStandardUE)
+        {
+            # When using $ueVersion, strip off 3rd digit if any
+            $regex = "(\d+\.\d+)(\.\d+)?"
+            $match = $ueVersion | Select-String -Pattern $regex
+
+            $ueVersionTrimmed = $match.Matches[0].Groups[1].Value
+            
+            $uinstall = Join-Path $uroot "UE_$ueVersionTrimmed"
+        } else {
+            # Find in the registry
+            $uinstall = Get-ItemPropertyValue 'Registry::HKEY_CURRENT_USER\Software\Epic Games\Unreal Engine\Builds' -Name $ueVersion
+            # Normalise
+            $uinstall = [System.IO.Path]::GetFullPath($uinstall)
+        }
     }
 
     # Test we can find RunUAT.bat
@@ -122,6 +136,29 @@ function Get-UE-Install {
     }
 
     return $uinstall
+}
+
+function Get-Actual-UE-Version {
+    param (
+        # the engine association which might be a build name not a standard version
+        [psobject]$ueVersionName
+    )
+
+    # If this is NOT a standard installed UE version (5.x), it's a custom build dir, source or binary
+    # We need to resolve it via registry on Windows
+    # It *might* be a GUID "{A1234786-..}" but it also might be a custom name
+    $isStandardUE = Is-Standard-UE-Version $ueVersionName
+    if (!$isStandardUE) {
+        # Look up the source dir from registry setting
+        $srcdir = Get-ItemPropertyValue 'Registry::HKEY_CURRENT_USER\Software\Epic Games\Unreal Engine\Builds' -Name $assoc
+        # In source build, read Build.version JSON
+        $buildverfile = Join-Path $srcdir "Engine/Build/Build.version"
+        $buildjson = (Get-Content $buildverfile) | ConvertFrom-Json
+        return "$($buildjson.MajorVersion).$($buildjson.MinorVersion)"
+    }
+
+    return $ueVersionName
+
 }
 
 function Get-UEEditorCmd {

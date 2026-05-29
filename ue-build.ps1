@@ -57,6 +57,7 @@ if (-not ($mode -in @('dev', 'cleandev', 'test', 'prod'))) {
 }
 
 . $PSScriptRoot\inc\buildtargets.ps1
+. $PSScriptRoot\inc\uproject.ps1
 
 $result = 0
 
@@ -82,43 +83,12 @@ try {
         Write-Output "Building $uprojname for $mode"
     }
 
-    # Check version number of Unreal project so we know which version to run
-    # We can read this from .uproject which is JSON
-    $uproject = Get-Content $uprojfile | ConvertFrom-Json
-    $uversion = $uproject.EngineAssociation
+    $uproject = Read-Uproject $uprojfile
+    $uversion = Get-UE-Version $uproject
+    $uinstall = Get-UE-Install $uversion
 
     Write-Output "Engine version is $uversion"
 
-    # UEINSTALL env var should point at the root of the *specific version* of 
-    # Unreal you want to use. This is mainly for use in source builds, default is
-    # to build it from version number and root of all UE binary installs
-    $uinstall = $Env:UEINSTALL
-
-    # Backwards compat with old env var
-    if (-not $uinstall) {
-        $uinstall = $Env:UE4INSTALL
-    }
-
-    if (-not $uinstall) {
-        # UEROOT should be the parent folder of all UE versions
-        $uroot = $Env:UEROOT
-        # Backwards compat with old env var
-        if (-not $uroot) {
-            $uroot = $Env:UE4ROOT
-        }
-        if (-not $uroot) {
-            $uroot = "C:\Program Files\Epic Games"
-        } 
-
-        $uinstall = Join-Path $uroot "UE_$uversion"
-    }
-
-    # Test we can find Build.bat
-    $batchfolder = Join-Path "$uinstall" "Engine\Build\BatchFiles"
-    $buildbat = Join-Path "$batchfolder" "Build.bat"
-    if (-not (Test-Path $buildbat -PathType Leaf)) {
-        throw "Build.bat missing at $buildbat : Aborting"
-    }
 
     $buildargs = ""
 
@@ -151,6 +121,13 @@ try {
             # We probably want to use custom launch profiles for this
             Write-Output "Mode '$mode' is not supported yet"
         }
+    }
+
+     # Test we can find Build.bat
+    $batchfolder = Join-Path "$uinstall" "Engine\Build\BatchFiles"
+    $buildbat = Join-Path "$batchfolder" "Build.bat"
+    if (-not (Test-Path $buildbat -PathType Leaf)) {
+        throw "Build.bat missing at $buildbat : Aborting"
     }
 
     if ($dryrun) {
