@@ -34,6 +34,8 @@ if ($help) {
     Exit 0
 }
 
+. $PSScriptRoot\inc\buildcmd.ps1
+
 $result = 0
 
 try {
@@ -69,17 +71,6 @@ try {
             }
         }
 
-        # Actually don't clean up anymore, no longer needed
-        # # Run cleanup tool
-        # $cleanupargs = @()
-        # if ($nocloseeditor) {
-        #     $cleanupargs += "-nocloseeditor"
-        # }
-        # if ($dryrun) {
-        #     $cleanupargs += "-dryrun"
-        # }
-        # # Use Invoke-Expression so we can use a string as options
-        # Invoke-Expression "&'$PSScriptRoot/ue-cleanup.ps1' $cleanupargs"
 
         # Stopped using rebase because it's a PITA when it goes wrong
         Write-Output "Pulling latest from Git..."
@@ -106,17 +97,9 @@ try {
     }
 
     # Now build
-    $cmdargs = @()
-    if ($nocloseeditor) {
-        $cmdargs += "-nocloseeditor"
-    }
-    if ($dryrun) {
-        $cmdargs += "-dryrun"
-    }
-    # Use Invoke-Expression so we can use a string as options
-    Invoke-Expression "&'$PSScriptRoot/ue-build.ps1' dev $cmdargs"
+    $result = Build-Project -mode dev -src $src -nocloseeditor True -dryrun $dryrun
 
-    if ($LASTEXITCODE -ne 0) {
+    if ($result -ne 0) {
         throw "Build process failed, see above"
     }
 

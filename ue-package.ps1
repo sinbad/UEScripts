@@ -32,7 +32,7 @@ param (
 . $PSScriptRoot\inc\uproject.ps1
 . $PSScriptRoot\inc\ueeditor.ps1
 . $PSScriptRoot\inc\filetools.ps1
-
+. $PSScriptRoot\inc\buildcmd.ps1
 
 function Write-Usage {
     Write-Output "Steve's Unreal packaging tool"
@@ -243,12 +243,13 @@ try {
     # to run the "Cook" stage. If we don't do this, then any source plugins will
     # be missing in a clean checkout build and the cook stage will fail
     Write-Output "Building Editor (for Cooking)"
-    $cmdargs = @()
-    $cmdargs += "-src:$src"
-    if ($dryrun) {
-        $cmdargs += "-dryrun"
+
+    $result = Build-Project -mode dev -src $src -dryrun $dryrun
+
+    if ($result -ne 0) {
+        throw "Build process failed, see above"
     }
-    Invoke-Expression "&'$PSScriptRoot/ue-build.ps1' -mode:dev $cmdargs"
+
 
     $ueEditorCmd = Get-UEEditorCmd $ueVersion $ueinstall
     $runUAT = Join-Path $ueinstall "Engine/Build/BatchFiles/RunUAT$batchSuffix"
