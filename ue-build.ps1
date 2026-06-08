@@ -58,7 +58,7 @@ if (-not ($mode -in @('dev', 'cleandev', 'test', 'prod'))) {
 
 . $PSScriptRoot\inc\buildcmd.ps1
 
-$result = Build-Project -mode $mode -src $src -nocloseeditor $nocloseeditor -dryrun $dryrun
+$result = Build-Project -mode $mode -src $src -nocloseeditor:$nocloseeditor -dryrun:$dryrun
 
 
 Exit $result

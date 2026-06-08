@@ -244,7 +244,7 @@ try {
     # be missing in a clean checkout build and the cook stage will fail
     Write-Output "Building Editor (for Cooking)"
 
-    $result = Build-Project -mode dev -src $src -dryrun $dryrun
+    $result = Build-Project -mode dev -src $src -dryrun:$dryrun
 
     if ($result -ne 0) {
         throw "Build process failed, see above"
