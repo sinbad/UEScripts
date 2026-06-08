@@ -23,7 +23,7 @@ function Build-Project {
 
     if (-not ($mode -in @('dev', 'cleandev', 'test', 'prod'))) {
         Print-Usage
-        Write-Information "ERROR: Invalid mode argument: $mode"
+        Write-Host "ERROR: Invalid mode argument: $mode"
         Exit 3
 
     }
@@ -33,7 +33,7 @@ function Build-Project {
     try {
         if ($src -ne ".") { Push-Location $src }
 
-        Write-Information "-- Build process starting --"
+        Write-Host "-- Build process starting --"
 
         # Locate Unreal project file
         $uprojfile = Get-ChildItem *.uproject | Select-Object -expand Name
@@ -47,16 +47,16 @@ function Build-Project {
         # In PS 6.0+ we could use Split-Path -LeafBase but let's stick with built-in PS 5.1
         $uprojname = [System.IO.Path]::GetFileNameWithoutExtension($uprojfile)
         if ($dryrun) {
-            Write-Information "Would build $uprojname for $mode"
+            Write-Host "Would build $uprojname for $mode"
         } else {
-            Write-Information "Building $uprojname for $mode"
+            Write-Host "Building $uprojname for $mode"
         }
 
         $uproject = Read-Uproject $uprojfile
         $uversion = Get-UE-Version $uproject
         $uinstall = Get-UE-Install $uversion
 
-        Write-Information "Engine version is $uversion"
+        Write-Host "Engine version is $uversion"
 
 
         $buildargs = ""
@@ -88,7 +88,7 @@ function Build-Project {
             default {
                 # TODO
                 # We probably want to use custom launch profiles for this
-                Write-Information "Mode '$mode' is not supported yet"
+                Write-Host "Mode '$mode' is not supported yet"
             }
         }
 
@@ -100,7 +100,7 @@ function Build-Project {
         }
 
         if ($dryrun) {
-            Write-Information "Would run: build.bat $buildargs"
+            Write-Host "Would run: build.bat $buildargs"
         } else {
             Write-Verbose "Running $buildbat $buildargs"
 
@@ -111,10 +111,10 @@ function Build-Project {
             }
         }
 
-        Write-Information "-- Build process finished OK --"
+        Write-Host "-- Build process finished OK --"
 
     } catch {
-            Write-Information "ERROR: $($_.Exception.Message)"
+            Write-Host "ERROR: $($_.Exception.Message)"
             $result = 9
     } finally {
         if ($src -ne ".") { Pop-Location }

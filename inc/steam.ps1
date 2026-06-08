@@ -7,7 +7,7 @@ function Release-Steam {
         [switch]$dryrun = $false
     )
 
-    Write-Information ">>>--- Steam Upload Start ---<<<"
+    Write-Host ">>>--- Steam Upload Start ---<<<"
 
     $appid = $variant.SteamAppId
     $depotid = $variant.SteamDepotId
@@ -35,7 +35,7 @@ function Release-Steam {
 
     # write app file up to depot section then fill that in as we do depots
     $appfile = "$steamconfigdir\app_build_$($appid).vdf"
-    Write-Information "Creating app build config $appfile"
+    Write-Host "Creating app build config $appfile"
     Remove-Item $appfile -Force -ErrorAction SilentlyContinue
     $appfp = New-Object -TypeName System.IO.FileStream(
         $appfile,
@@ -59,7 +59,7 @@ function Release-Steam {
     # Just one in this case
     $depotfilerel = "depot_${target}_${depotid}.vdf"
     $depotfile = "$steamconfigdir\$depotfilerel"
-    Write-Information "Creating depot build config $depotfile"
+    Write-Host "Creating depot build config $depotfile"
     Remove-Item $depotfile -Force -ErrorAction SilentlyContinue
     $depotfp = New-Object -TypeName System.IO.FileStream(
         $depotfile,
@@ -91,20 +91,20 @@ function Release-Steam {
     $appstream.Close()
 
     if ($dryrun) {
-        Write-Information "Would have run Steam command:"
-        Write-Information " > steamcmd +login $($login) +run_app_build_http $appfile +quit"
+        Write-Host "Would have run Steam command:"
+        Write-Host " > steamcmd +login $($login) +run_app_build_http $appfile +quit"
     } else {
-        Write-Information "Releasing version $version to Steam ($appid)"
+        Write-Host "Releasing version $version to Steam ($appid)"
         steamcmd +login $($login) +run_app_build_http $appfile +quit
         if (!$?) {
             throw "Steam upload tool failed!"
         }
     }
 
-    Write-Information ">>>--- Steam Upload Done ---<<<"
-    Write-Information ""
+    Write-Host ">>>--- Steam Upload Done ---<<<"
+    Write-Host ""
     if (-not $dryrun) {
-        Write-Information "-- Remember to release in Steamworks Admin --"
+        Write-Host "-- Remember to release in Steamworks Admin --"
     }
 
 }
