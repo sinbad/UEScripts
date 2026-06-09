@@ -97,7 +97,7 @@ try {
     }
 
     # Now build
-    $result = Build-Project -mode dev -src $src -nocloseeditor True -dryrun $dryrun
+    $result = Build-Project -mode dev -src $src -nocloseeditor:$true -dryrun:$dryrun
 
     if ($result -ne 0) {
         throw "Build process failed, see above"
