@@ -184,7 +184,7 @@ try {
                 Write-Output "~-~-~ Launching Game To Record PSO Usage ~-~-~"
                 Write-Output ""
 
-                $proc = Start-Process $game $argList -Wait -PassThru -NoNewWindow
+                $proc = Start-Process $game $argList -PassThru -NoNewWindow | Wait-Process -PassThru
                 if ($proc.ExitCode -ne 0) {
                     throw "Running game failed!"
                 }
@@ -231,7 +231,7 @@ try {
                 Write-Output "~-~-~ Expanding PSO Data, creating SPC file (bundled PSOs) ~-~-~"
                 Write-Output ""
 
-                $proc = Start-Process $uecmd $argList -Wait -PassThru -NoNewWindow
+                $proc = Start-Process $uecmd $argList -PassThru -NoNewWindow | Wait-Process -PassThru
                 if ($proc.ExitCode -ne 0) {
                     throw "Creating .spc file failed!"
                 }

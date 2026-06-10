@@ -104,7 +104,7 @@ function Build-Project {
         } else {
             Write-Verbose "Running $buildbat $buildargs"
 
-            $proc = Start-Process $buildbat $buildargs -Wait -PassThru -NoNewWindow
+            $proc = Start-Process $buildbat $buildargs -PassThru -NoNewWindow | Wait-Process -PassThru
             if ($proc.ExitCode -ne 0) {
                 $code = $proc.ExitCode
                 throw "*** Build exited with code $code, see above"

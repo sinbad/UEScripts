@@ -171,7 +171,7 @@ try {
         Write-Output " > robocopy $($argList -join " ")"
 
     } else {            
-        $proc = Start-Process "robocopy" $argList -Wait -PassThru -NoNewWindow
+        $proc = Start-Process "robocopy" $argList -PassThru -NoNewWindow | Wait-Process -PassThru
         # Robocopy can return up to value 8 for success
         # See https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy
         if ($proc.ExitCode -gt 8) {

@@ -123,7 +123,7 @@ try {
             Write-Output ""
 
         } else {            
-            $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
+            $proc = Start-Process $runUAT $argList -PassThru -NoNewWindow | Wait-Process -PassThru
             if ($proc.ExitCode -ne 0) {
                 # Reset the plugin back to the original UE version
                 if (($allversions -or $uever) -and -not $dryrun) {
@@ -156,7 +156,7 @@ try {
             } else {      
                 Write-Output "Compressing to $zipdst"
                 Remove-Item -Path $zipdst -Force -ErrorAction SilentlyContinue
-                $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
+                $proc = Start-Process "7z.exe" $argList -PassThru -NoNewWindow | Wait-Process -PassThru
                 if ($proc.ExitCode -ne 0) {
                     throw "7-Zip failed!"
                 }

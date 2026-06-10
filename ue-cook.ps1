@@ -138,7 +138,7 @@ try {
         Write-Output ""
 
     } else {            
-        $proc = Start-Process $runUAT $argList -Wait -PassThru -NoNewWindow
+        $proc = Start-Process $runUAT $argList -PassThru -NoNewWindow | Wait-Process -PassThru
         if ($proc.ExitCode -ne 0) {
             throw "RunUAT failed!"
         }

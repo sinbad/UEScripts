@@ -81,7 +81,7 @@ try {
         Write-Output "> $ueEditorCmd $($argList -join " ")"
 
     } else {
-        $proc = Start-Process $ueEditorCmd $argList -Wait -PassThru -NoNewWindow
+        $proc = Start-Process $ueEditorCmd $argList -PassThru -NoNewWindow | Wait-Process -PassThru
         if ($proc.ExitCode -ne 0) {
             throw "Blueprint recompile build failed!"
         }

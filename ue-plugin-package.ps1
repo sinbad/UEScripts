@@ -232,7 +232,7 @@ try {
 
         } else {      
             Remove-Item -Path $zipdst -Force -ErrorAction SilentlyContinue
-            $proc = Start-Process "7z.exe" $argList -Wait -PassThru -NoNewWindow
+            $proc = Start-Process "7z.exe" $argList -PassThru -NoNewWindow | Wait-Process -PassThru
             if ($proc.ExitCode -ne 0) {
                 throw "7-Zip failed!"
             }

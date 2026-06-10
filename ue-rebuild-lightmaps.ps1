@@ -133,7 +133,7 @@ try {
 
     } else {
         Write-Output "Starting lighting build; see Swarm Agent for full progress monitoring..."
-        $proc = Start-Process $ueEditorCmd $argList -Wait -PassThru -NoNewWindow
+        $proc = Start-Process $ueEditorCmd $argList -PassThru -NoNewWindow | Wait-Process -PassThru
         if ($proc.ExitCode -ne 0) {
             throw "Lightmap build failed!"
         }
