@@ -75,6 +75,14 @@ try {
 
     Write-Output "Engine version is $uversion"
 
+    try {
+        $config = Read-Package-Config -srcfolder:$src
+        $foundmaps = Find-Files -startDir:$(Join-Path $src "Content") -pattern:*.umap -includeByDefault:$config.CookAllMaps -includeBaseNames:$config.MapsIncluded -excludeBaseNames:$config.MapsExcluded
+
+        $maps = $foundmaps.BaseNames
+    } catch {
+        Write-Output "Couldn't read map list from packageconfig.json, no maps will be cooked"
+    }
 
     # Test we can find RunUAT
     $ueEditorCmd = Get-UEEditorCmd $uversion $uinstall
