@@ -58,7 +58,8 @@ function Get-Package-Client-Dir {
         throw "Unknown variant $variantName"
     }
 
-    $isUE5 = $ueVersion.StartsWith("5.")
+    # Assume that a source build is 5, only detect UE4 on 4.x builds now
+    $isUE5 = !$ueVersion.StartsWith("4.")
     # Note, currently only supporting "Game" platform type, not separate client / server
     $subfolder = switch ($variant.Platform) {
         "Win32" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
