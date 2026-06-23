@@ -339,19 +339,25 @@ try {
         {
             # For shipping, move the PDBs aside but keep them for later use
             $outDirPDB = "$($outDir)-ShippingPDB"
-            Remove-Item -Path $outDirPDB -Force -ErrorAction SilentlyContinue
-            New-Item -ItemType Directory $outDirPDB -Force > $null
 
-            $pdbs = @(Get-ChildItem -Path $outDir -Filter *.pdb -Recurse -ErrorAction SilentlyContinue -Force)
-            # Need to be in dir to calculate relative
-            Push-Location $outDir 
-            $pdbs | ForEach-Object {
-                $pdbdir = Join-Path $outDirPDB $($_.DirectoryName | Resolve-Path -Relative)
-                New-Item -ItemType Directory $pdbdir -Force > $null
-                $pdbdest = Join-Path $outDirPDB $($_.FullName | Resolve-Path -Relative)
-                Move-Item $_.FullName $pdbdest -Force
+            if ($dryrun) {
+                Write-Output "Would have moved Shipping PDBs from $outdir to $outDirPDB"
+            } else {
+
+                Remove-Item -Path $outDirPDB -Force -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory $outDirPDB -Force > $null
+
+                $pdbs = @(Get-ChildItem -Path $outDir -Filter *.pdb -Recurse -ErrorAction SilentlyContinue -Force)
+                # Need to be in dir to calculate relative
+                Push-Location $outDir 
+                $pdbs | ForEach-Object {
+                    $pdbdir = Join-Path $outDirPDB $($_.DirectoryName | Resolve-Path -Relative)
+                    New-Item -ItemType Directory $pdbdir -Force > $null
+                    $pdbdest = Join-Path $outDirPDB $($_.FullName | Resolve-Path -Relative)
+                    Move-Item $_.FullName $pdbdest -Force
+                }
+                Pop-Location
             }
-            Pop-Location
         }
 
 
@@ -394,7 +400,7 @@ catch {
     Exit 9
 }
 
-if (-not $test -and $isGit) {
+if (-not $test -and $isGit -and -not $dryrun) {
     # Revert any remaining temp changes
     git checkout .
 }
