@@ -335,13 +335,13 @@ try {
             
         }
 
-        if ($var.Configuration -eq "Shipping")
+        if ($var.SeparateDebugSymbols)
         {
             # For shipping, move the PDBs aside but keep them for later use
-            $outDirPDB = "$($outDir)-ShippingPDB"
+            $outDirPDB = "$($outDir)-DebugSymbols"
 
             if ($dryrun) {
-                Write-Output "Would have moved Shipping PDBs from $outdir to $outDirPDB"
+                Write-Output "Would have moved debug symbols from $outdir to $outDirPDB"
             } else {
 
                 Remove-Item -Path $outDirPDB -Force -ErrorAction SilentlyContinue

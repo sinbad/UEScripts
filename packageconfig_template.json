@@ -34,6 +34,7 @@
             "Name": "PublicWin64SteamBuild", 
             "Platform": "Windows",
             "Configuration": "Shipping",
+            "SeparateDebugSymbols": true,
             "ReleaseTo": [
                 "Steam"
             ],

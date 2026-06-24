@@ -24,6 +24,8 @@ class PackageVariant {
     [string]$ItchAppId
     # Itch channel, if you intend to send this variant to Itch (usually a platform)
     [string]$ItchChannel
+    # Set to true to move debug symbols aside into their own folder when packaging so they're not included with the release
+    [bool]$SeparateDebugSymbols
 
     PackageVariant() {
         $this.Configuration = "Development"

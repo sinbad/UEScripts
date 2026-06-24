@@ -40,6 +40,7 @@ in detail later in this document, but but here's an example demonstrating many o
             "Name": "Win64Steam", 
             "Platform": "Win64",
             "Configuration": "Shipping",
+            "SeparateDebugSymbols": true,
             "ReleaseTo": [
                 "Steam"
             ],
@@ -181,6 +182,13 @@ Unreal, e.g. "Win64", "Linux" etc
 *Mandatory Setting - string*
 
 The build configuration for this variant as defined by Unreal, e.g. "Development" or "Shipping".
+
+### `SeparateDebugSymbols`
+*Optional Setting - boolean: Default = false*
+
+If true, debug symbol files will be moved out of the packaged output into a sibling folder so they won't be included
+with the released files.
+
 
 ### `ExtraBuildArguments`
 *Optional Setting - string*

@@ -90,7 +90,7 @@ function Get-Debug-Symbols-Dir {
 
     if ($variant.Configuration -eq "Shipping") {
         # For shipping, we've moved the PDBs aside
-        return "$($root)-ShippingPDB"
+        return "$($root)-DebugSymbols"
     }
 
     return $root
