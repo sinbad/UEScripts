@@ -77,6 +77,9 @@ class PackageConfig {
     [array]$Variants
     # Names of the default variant(s) to package / release if unspecified
     [array]$DefaultVariants
+    # Bugsplat properties
+    [string]$BugsplatDatabase
+    [string]$BugsplatApp
 
     PackageConfig([PSCustomObject]$obj) {
         # Construct from JSON object

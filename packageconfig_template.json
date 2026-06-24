@@ -62,6 +62,9 @@
         }
     ],
 
+    "BugsplatDatabase" : "bugsplat_db_name",
+    "BugsplatApp" : "bugsplat_app_name"
+
 }
 
 

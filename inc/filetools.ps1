@@ -72,6 +72,30 @@ function Get-Package-Client-Dir {
     return Join-Path $root $subfolder
 }
 
+# Get the dir where the debug symbols are
+function Get-Debug-Symbols-Dir {
+    param (
+        [PackageConfig]$config,
+        [string]$versionNumber,
+        [string]$variantName,
+        [string]$ueVersion
+    )
+
+    $root = Get-Package-Dir -config:$config -versionNumber:$versionNumber -variantName:$variantName
+    $variant = $config.Variants | Where-Object { $_.Name -eq $variantName } | Select-Object -First 1
+
+    if (-not $variant) {
+        throw "Unknown variant $variantName"
+    }
+
+    if ($variant.Configuration -eq "Shipping") {
+        # For shipping, we've moved the PDBs aside
+        return "$($root)-ShippingPDB"
+    }
+
+    return $root
+}
+
 # Return whether 2 files seem to be the same based on their size and date/time
 # Does not compare their contents!
 function Compare-Files-Quick {
