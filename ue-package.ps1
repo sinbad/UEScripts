@@ -370,7 +370,6 @@ try {
 [CrashReportClient]
 CrashReportClientVersion=1.0
 DataRouterUrl="https://$($config.BugsplatDatabase).bugsplat.com/post/ue4/$($config.BugsplatApp)/$versionNumber"
-bSendLogFile=true
 "@
             if ($dryrun) {
                 Write-Output "Would have created $crashConfigFile with contents:"
