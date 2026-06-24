@@ -360,6 +360,31 @@ try {
             }
         }
 
+        if ($config.BugsplatDatabase.Length -gt 0 -and $config.BugsplatApp.Length -gt 0)
+        {
+            # Create the config file CrashReporter needs
+            # See https://docs.bugsplat.com/introduction/getting-started/integrations/game-development/unreal-engine
+            $crashConfigDir = Join-Path $outDir "Engine/Restricted/NoRedist/Programs/CrashReportClient/Config"
+            $crashConfigFile = Join-Path $crashConfigDir "DefaultEngine.ini"
+            $crashConfigContents = @"
+[CrashReportClient]
+CrashReportClientVersion=1.0
+DataRouterUrl="https://$($config.BugsplatDatabase).bugsplat.com/post/ue4/$($config.BugsplatApp)/$versionNumber"
+bSendLogFile=true
+"@
+            if ($dryrun) {
+                Write-Output "Would have created $crashConfigFile with contents:"
+                Write-Output "--------------------------------------"
+                Write-Output $crashConfigContents
+                Write-Output "--------------------------------------"
+
+            } else {
+                Write-Output "Writing $crashConfigFile"
+                New-Item -ItemType Directory $crashConfigDir -Force > $null
+                $crashConfigContents | Out-File -FilePath $crashConfigFile
+            }
+        }
+
 
         if ($var.Zip -and -not $skipzip) {
             if ($dryrun) {
