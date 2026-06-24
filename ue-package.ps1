@@ -83,12 +83,12 @@ if ($test) {
 
 if (([bool]$major + [bool]$minor + [bool]$patch + [bool]$hotfix) -gt 1) {
     Write-Output "ERROR: Can't set more than one of major/minor/patch/hotfix at the same time!"
-    Print-Usage
+    Write-Usage
     Exit 5
 }
 if (($major -or $minor -or $patch -or $hotfix) -and $keepversion) {
     Write-Output  "ERROR: Can't set keepversion at the same time as major/minor/patch/hotfix!"
-    Print-Usage
+    Write-Usage
     Exit 5
 }
 
