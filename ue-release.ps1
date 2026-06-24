@@ -29,7 +29,7 @@ function Write-Usage {
     Write-Output "Usage:"
     Write-Output "  ue-release.ps1 [-version:ver|-latest] -variant:var -services:steam,itch [-src:sourcefolder] [-dryrun]"
     Write-Output " "
-    Write-Output "  -version:ver        : Version to release; must have been packaged already"
+    Write-Output "  -version:ver        : Version to release; must have been packaged already (or use -latest)"
     Write-Output "  -latest             : Instead of an explicit version, release one identified in project settings"
     Write-Output "  -variants:var1,var2 : Name of variants to release. Omit to use DefaultVariants"
     Write-Output "  -services:s1,s2     : Name of services to release to. Can omit and rely on ReleaseTo"
@@ -54,7 +54,7 @@ if ($src.Length -eq 0) {
 if (-not $version -and -not $latest) {
     Write-Usage
     Write-Output ""
-    Write-Output "ERROR: You must specify a version"
+    Write-Output "ERROR: You must specify a version or -latest"
     Exit 1
 }
 
