@@ -60,6 +60,9 @@ in detail later in this document, but but here's an example demonstrating many o
             "ItchChannel": "win64"
         }
     ],
+
+    "BugsplatDatabase" : "bugsplat_db_name",
+    "BugsplatApp" : "bugsplat_app_name"
 }
 
 ```
@@ -188,6 +191,16 @@ The build configuration for this variant as defined by Unreal, e.g. "Development
 
 If true, debug symbol files will be moved out of the packaged output into a sibling folder so they won't be included
 with the released files.
+
+### `BugsplatDatabase`
+*Optional Setting - string*
+
+The name of your [Bugsplat](Bugsplat.md) database.
+
+### `BugsplatApp`
+*Optional Setting - string*
+
+The name of your [Bugsplat](Bugsplat.md) application.
 
 
 ### `ExtraBuildArguments`

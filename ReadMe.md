@@ -13,6 +13,7 @@ These scripts support **UE4 and UE5** and will detect which one your project is 
 * [Packaging a Game](./doc/Package.md): building, cooking, archiving
 * [Releasing a Game](./doc/Release.md): e.g. uploading to Itch, Steam
 * [Building bundled PSO caches](./doc/BundledPSO.md): to fix shader stutters
+* [Uploading symbols to Bugsplat](./doc/Bugsplat.md) for crash handling]
 * [Rebuilding Lightmaps](./doc/RebuildLightmaps.md): build lighting on the command line easily (supporting git-lfs locking, no P4 dependency like RunUAT)
 * [Getting Latest for Artists](./doc/GetLatest.md): pulls from git and builds so C++ changes are automatically updated
 * [Synchronising BuiltData Files outside of Git](./doc/DataSync.md)
