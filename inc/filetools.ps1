@@ -88,7 +88,7 @@ function Get-Debug-Symbols-Dir {
         throw "Unknown variant $variantName"
     }
 
-    if ($variant.Configuration -eq "Shipping") {
+    if ($variant.SeparateDebugSymbols) {
         # For shipping, we've moved the PDBs aside
         return "$($root)-DebugSymbols"
     }
