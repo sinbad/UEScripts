@@ -364,7 +364,8 @@ try {
         {
             # Create the config file CrashReporter needs
             # See https://docs.bugsplat.com/introduction/getting-started/integrations/game-development/unreal-engine
-            $crashConfigDir = Join-Path $outDir "Engine/Restricted/NoRedist/Programs/CrashReportClient/Config"
+            $buildsubdir = Join-Path $outDir $(Get-Platform-Subdir $var.Platform $ueVersion)
+            $crashConfigDir = Join-Path $buildsubdir "Engine/Restricted/NoRedist/Programs/CrashReportClient/Config"
             $crashConfigFile = Join-Path $crashConfigDir "DefaultEngine.ini"
             $crashConfigContents = @"
 [CrashReportClient]

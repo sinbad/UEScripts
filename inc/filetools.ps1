@@ -41,6 +41,26 @@ function Get-Package-Dir {
     return Join-Path $config.OutputDir "$versionNumber/$variantName"
 }
 
+function Get-Platform-Subdir {
+param (
+        [string]$platform,
+        [string]$ueVersion
+    )
+
+    # Assume that a source build is 5, only detect UE4 on 4.x builds now
+    $isUE5 = !$ueVersion.StartsWith("4.")
+    # Note, currently only supporting "Game" platform type, not separate client / server
+    $subfolder = switch ($platform) {
+        "Win32" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
+        "Win64" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
+        "Linux" { if ($isUE5) { "Linux" } else { "LinuxNoEditor" } }
+        "Mac" { if ($isUE5) { "Mac" } else { "MacNoEditor" } }
+        Default { throw "Unsupported platform $($platform)" }
+    }
+
+    return $subfolder
+}
+
 # Get the dir where the client build is for a packaged version / variant
 # This is as Get-Package-Dir except with one extra level e.g. WindowsNoEditor
 function Get-Package-Client-Dir {
@@ -58,18 +78,7 @@ function Get-Package-Client-Dir {
         throw "Unknown variant $variantName"
     }
 
-    # Assume that a source build is 5, only detect UE4 on 4.x builds now
-    $isUE5 = !$ueVersion.StartsWith("4.")
-    # Note, currently only supporting "Game" platform type, not separate client / server
-    $subfolder = switch ($variant.Platform) {
-        "Win32" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
-        "Win64" { if ($isUE5) { "Windows" } else { "WindowsNoEditor" } }
-        "Linux" { if ($isUE5) { "Linux" } else { "LinuxNoEditor" } }
-        "Mac" { if ($isUE5) { "Mac" } else { "MacNoEditor" } }
-        Default { throw "Unsupported platform $($variant.Platform)" }
-    }
-
-    return Join-Path $root $subfolder
+    return Join-Path $root $(Get-Platform-Subdir $variant.Platform $ueVersion)
 }
 
 # Get the dir where the debug symbols are
