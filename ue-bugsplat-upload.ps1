@@ -112,11 +112,13 @@ try {
     $hasErrors = $false
     foreach ($variantConfig in $variantConfigs) {
 
-        # Get source dir
-        $sourcedir = Get-Debug-Symbols-Dir -config:$config -versionNumber:$version -variantName:$variantConfig.Name -ueVersion:$ueVersion
+        # Get source dirs
+        # PDBs are separate, but we also need to upload the main EXE
+        $pdbsourcedir = Get-Debug-Symbols-Dir -config:$config -versionNumber:$version -variantName:$variantConfig.Name -ueVersion:$ueVersion
+        $exesourcedir = Get-Package-Client-Dir -config:$config -versionNumber:$version -variantName:$variantConfig.Name -ueVersion:$ueVersion
 
-        if (-not (Test-Path $sourcedir -PathType Container)) {
-            Write-Error "PDB source folder $sourcedir does not exist, skipping"
+        if (-not (Test-Path $pdbsourcedir -PathType Container)) {
+            Write-Error "PDB source folder $pdbsourcedir does not exist, skipping"
             $hasErrors = $true
             continue
         }
@@ -124,7 +126,8 @@ try {
         Write-Output ""
         Write-Output "Variant         : $($variantConfig.Name)"
         Write-Output "Version         : $version"
-        Write-Output "Source Folder   : $sourcedir"
+        Write-Output "PDB Folder      : $pdbsourcedir"
+        Write-Output "EXE Folder      : $exesourcedir"
         Write-Output "Bugsplat DB     : $config.BugsplatDatabase"
         Write-Output "Bugsplat App    : $config.BugsplatApp"
         Write-Output ""
@@ -133,13 +136,15 @@ try {
         $uploadargs = "-f `"**/*.{pdb,exe,dll}`" -b $($config.BugsplatDatabase) -a $($config.BugsplatApp) -v $version"
 
         if ($dryrun) {
-            Write-Host "Would run: $symbolupload $uploadargs"
-            Write-Host "In directory $sourcedir"
+            Write-Host "Would run (1): $symbolupload $uploadargs"
+            Write-Host "In directory $pdbsourcedir"
+            Write-Host "Would run (2): $symbolupload $uploadargs"
+            Write-Host "In directory $exesourcedir"
         } else {
-            Write-Verbose "Running $symbolupload $uploadargs"
+            Write-Verbose "Running $symbolupload $uploadargs (PDBs)"
 
             # symbol-upload uploads from the *current dir*
-            Push-Location $sourcedir
+            Push-Location $pdbsourcedir
             $proc = Start-Process $symbolupload $uploadargs -PassThru -NoNewWindow | Wait-Process -PassThru
             if ($proc.ExitCode -ne 0) {
                 Pop-Location
@@ -147,6 +152,20 @@ try {
                 throw "*** Upload exited with code $code, see above"
             }
             Pop-Location
+
+            Write-Verbose "Running $symbolupload $uploadargs (EXEs)"
+
+            # symbol-upload uploads from the *current dir*
+            Push-Location $exesourcedir
+            $proc = Start-Process $symbolupload $uploadargs -PassThru -NoNewWindow | Wait-Process -PassThru
+            if ($proc.ExitCode -ne 0) {
+                Pop-Location
+                $code = $proc.ExitCode
+                throw "*** Upload exited with code $code, see above"
+            }
+            Pop-Location
+
+
         }
 
     }
