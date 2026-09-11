@@ -82,6 +82,8 @@ class PackageConfig {
     # Bugsplat properties
     [string]$BugsplatDatabase
     [string]$BugsplatApp
+    # PatchNotes dir
+    [string]$PatchNotesDir
 
     PackageConfig([PSCustomObject]$obj) {
         # Construct from JSON object

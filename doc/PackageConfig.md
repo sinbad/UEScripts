@@ -62,7 +62,9 @@ in detail later in this document, but but here's an example demonstrating many o
     ],
 
     "BugsplatDatabase" : "bugsplat_db_name",
-    "BugsplatApp" : "bugsplat_app_name"
+    "BugsplatApp" : "bugsplat_app_name",
+
+    "PatchNotesDir" : "Path/To/Patch/Notes"
 }
 
 ```
@@ -202,6 +204,11 @@ The name of your [Bugsplat](Bugsplat.md) database.
 
 The name of your [Bugsplat](Bugsplat.md) application.
 
+### `PatchNotesDir`
+*Optional Setting - string*
+
+Subdirectory of your project dir to expect a file called "{major}.{minor}.{patch}.txt" and to disallow packaging
+if it's missing (barring hotfix builds).
 
 ### `ExtraBuildArguments`
 *Optional Setting - string*

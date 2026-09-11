@@ -202,7 +202,12 @@ try {
     } else {
         # Bump up version, passthrough options
         try {
-            $versionNumber = Increment-Project-Version -srcfolder:$src -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix -dryrun:$dryrun
+            $versionNumber = Get-Next-Project-Version -srcfolder:$src -major:$major -minor:$minor -patch:$patch -hotfix:$hotfix -dryrun:$dryrun
+
+            Check-Project-Version -srcfolder:$src -newversion:$versionNumber -hotfix:$hotfix -config:$config
+
+            Write-Project-Version -srcfolder:$src -newversion:$versionNumber -dryrun:$dryrun
+
             if (-not $dryrun -and $isGit) {
                 if ($src -ne ".") { Push-Location $src }
 

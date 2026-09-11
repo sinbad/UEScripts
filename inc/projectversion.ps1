@@ -82,10 +82,10 @@ function Write-Project-Version {
             #Out-IniFile -Force -InputObject $gameIni -FilePath $gameIniFile
 
             $verlineregex = "ProjectVersion=.*"
-            $matches = Select-String -Path "$gameIniFile" -Pattern $verlineregex
+            $thematches = Select-String -Path "$gameIniFile" -Pattern $verlineregex
         
-            if ($matches.Matches.Count -gt 0) {
-                $origline = $matches.Matches[0].Value
+            if ($thematches.Matches.Count -gt 0) {
+                $origline = $thematches.Matches[0].Value
                 $newline = "ProjectVersion=$newversion"
         
                 (Get-Content "$gameIniFile").replace($origline, $newline) | Set-Content "$gameIniFile"
@@ -99,7 +99,10 @@ function Write-Project-Version {
         }
 
 }
-function Increment-Project-Version {
+
+
+
+function Get-Next-Project-Version {
 
     param (
         [string]$srcfolder,
@@ -116,19 +119,6 @@ function Increment-Project-Version {
 
     $versionobj = Get-ProjectVersionComponents $srcfolder
 
-    $gameIniFile = Get-Project-Version-Ini-Filename $srcfolder
-
-    Write-Verbose "[version++] M:$major m:$minor p:$patch h:$hotfix"
-
-    # We have to use Write-Verbose now that we're using the return value, Write-Output
-    # appends to the return value. Write-Verbose works but doesn't appear by default
-    # Unless user sets $VerbosePreference="Continue"
-
-    # Bump the version number of the build
-    Write-Verbose "[inc_version] Updating $gameIniFile"
-
-    Write-Verbose "[version++] Current version is $($versionObj.digits[0]).$($versionObj.digits[1]).$($versionObj.digits[2]).$($versionObj.digits[3])"  
-    
     $versionDigit = 2;
     if ($major) {
         $versionDigit = 0
@@ -146,11 +136,53 @@ function Increment-Project-Version {
     }
 
     $newver = "$($versionObj.prefix)$($versionObj.digits[0]).$($versionObj.digits[1]).$($versionObj.digits[2]).$($versionObj.digits[3])$($versionObj.postfix)"
-    Write-Verbose "[version++] Bumping version to $newver"
-
-    Write-Project-Version -srcfolder:$srcfolder -newversion:$newver -dryrun:$dryrun
 
     return "$newver"
-
 }
 
+function Check-Project-Version {
+    param (
+        [string]$srcfolder,
+        [string]$newversion,
+        [bool]$hotfix,
+        [PackageConfig]$config
+        )
+
+    # Validate this new project version
+
+    # Check for patch notes file if we're using that
+    if (-not $hotfix -and $config.PatchNotesDir.Length -gt 0) {
+        # Strip off the 4th version digit
+        $regex = "([^\d]*)(\d+)\.(\d+)(?:\.(\d+))?(?:\.(\d+))?(.*)"
+        $vmatch = $newversion | Select-String -Pattern $regex
+        if (($vmatch.Matches.Count -gt 0) -and ($vmatch.Matches[0].Groups.Count -gt 4)) {
+            # 1 = prefix
+            # 2-5 = version number components (we skip last)
+            # 6 = postfix
+            
+            $digits = $vmatch.Matches[0].Groups[2..4] | ForEach-Object {
+                if ($_.Value -ne "") {
+                    [int]$_.Value
+                }
+                else {
+                    # We fill in the version numbers to 3 digits always
+                    0
+                }
+
+            }
+
+            # x.x.x only
+            $filename = "$($digits[0]).$($digits[1]).$($digits[2]).txt"
+
+            $fullpath = Join-Path $srcfolder $config.PatchNotesDir $filename
+
+            if (-not (Test-Path $fullpath -PathType Leaf))
+            {
+                throw "Missing patch notes, expected them at $fullpath"
+            }
+
+        } else {
+            throw "Can't parse version number $newversion to check"
+        }
+    }
+}
